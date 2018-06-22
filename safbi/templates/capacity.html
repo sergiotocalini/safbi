@@ -238,7 +238,7 @@ $(document).ready(function () {
 	showCancel: true,
     });
 
-    wizard.on('closed', function() {
+    wizard.on("closed", function() {
 	wizard.reset();
     });
 
@@ -246,7 +246,6 @@ $(document).ready(function () {
 	wizard.modal.find(':input').val('').removeAttr('disabled');
 	wizard.modal.find('.form-group').removeClass('has-error').removeClass('has-succes');
 	wizard.modal.find('#fqdn').data('is-valid', 0).data('lookup', 0);
-	autosize_tables();
     });
 
     wizard.on("submit", function(wizard) {
@@ -293,6 +292,7 @@ $(document).ready(function () {
     $(document).on("click", "[data-click=section-simulation]", function(a) {
 	a.preventDefault();
 	wizard.show();
+	wizard.reset();
     });
     
     setTimeout(function () {
