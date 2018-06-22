@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Unauthorized</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/app/img/favicon.ico" type="image/x-icon"/>
+    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="{{ config['CDN_FONTAWESOME'] }}/css/fontawesome-all.min.css" rel="stylesheet">
+    <link href="{{ config['CDN_LOCAL'] }}/app/css/style.css" rel="stylesheet">
+    <!-- <link href="{{ config['CDN_MAVAPA'] }}/mavapa.css" rel="stylesheet"> -->
+  </head>
+  <body>
+    <nav class="header-bar navbar navbar-default navbar-static-top fullwidth">
+      <div class="content-bar">
+	<div class="navbar-header logo" style="width: 5% !important;">
+	  <a href="{{ url_for('index') }}"></a>
+	  <img src="{{ config['CDN_LOCAL'] }}/app/img/logo.png" alt="iman-logo">
+	</div>
+
+	<div id="navbar" class="navbar-collapse collapse">
+	  <ul class="nav navbar-nav navbar-right">
+	    <li class="nav">
+	      <p class="nav">{{ session.user.displayname }}</p>
+	    </li>
+	    <li class="nav dropdown">
+	      <a id="mavapa-apps-dropdown" href="#" class="nav dropdown-toggle" data-toggle="dropdown"
+		 href="javascript:;">
+		<i class="fa fa-th fa-lg"></i>
+	      </a>
+	      <ul id="mavapa-apps-menu" class="dropdown-menu pull-right">
+	      </ul>
+	    </li>
+	    <li class="nav dropdown">
+	      <a class="nav dropdown-toggle" data-toggle="dropdown" href="javascript:;">
+		<img class="img-circle" src="{{ session.user.avatar }}">
+	      </a>
+	      <ul class="dropdown-menu pull-right">
+		<li>
+		  <a href="{{ url_for('logout') }}">
+		    <i class="fa fa-sign-out fa-fw"></i>
+		    Logout
+		  </a>
+		</li>
+	      </ul>
+	    </li>
+	  </ul>
+	</div>
+
+      </div>
+    </nav>
+
+    <div class="wrapper fullwidth">
+      <div id="unauth">
+	<div class="banner"
+	     style="background-image: url('{{ config['CDN_LOCAL'] }}/app/img/unauthorized.jpg');
+		    background-size: 100% 100%;">
+	</div>
+	<div class="info">
+	  <div class="account box-content right">
+	    <div class="signed">You are signed in as:</div>
+	    <div class="profile">
+	      <img src="{{ session.user.avatar }}" aria-hidden="true">
+	      <div class="details">
+		<p class="display">{{ session.user.displayname }}</p>
+		<p class="email">{{ session.user.email }}</p>
+	      </div>
+	      <a class="logout" href="{{ url_for('logout') }}">Sign out</a>
+	    </div>
+	  </div>
+	  <div class="divider-vert"></div>
+	  <div class="message">
+	    <p class="title">Sorry!</p>
+	    <p class="content">This is a restricted area and your account is not authorized to use this application.</p>
+	  </div>
+	</div>
+      </div>
+    </div>
+    <div class="footer-bar fullwidth">
+      <div class="content-bar">
+	<ul class="links">
+	  <span>
+	    <small>©&nbsp; 2016</small>
+	  </span>
+	  <li>
+	    <a href=""><small>Developers</small></a>
+	  </li>
+	  <li>
+	    <a href=""><small>Support</small></a>
+	  </li>
+	  <li>
+	    <a href=""><small>Privacy</small></a>
+	  </li>
+	  <li>
+	    <a href=""><small>Terms</small></a>
+	  </li>
+	</ul>
+      </div>
+    </div>
+  </body>
+
+  <script src="{{ config['CDN_JQUERY'] }}/jquery.min.js"></script>
+  <script src="{{ config['CDN_BOOTSTRAP'] }}/js/bootstrap.min.js"></script>
+  <!-- <script src="{{ config['CDN_MAVAPA'] }}/mavapa.js"></script> -->
+</html>

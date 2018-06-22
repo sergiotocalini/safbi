@@ -1,0 +1,244 @@
+<!doctype html>
+<html>
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/app/img/favicon.ico" type="image/x-icon"/>    
+    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap-theme.min.css" rel="stylesheet">
+    <link href="{{ config['CDN_FONTAWESOME'] }}/css/fontawesome-all.css" rel="stylesheet">
+    <link href="{{ config['CDN_LOCAL'] }}/app/css/style.css" rel="stylesheet">
+<!--    <link href="{{ config['CDN_MAVAPA'] }}/mavapa.css" rel="stylesheet"> -->
+  </head>
+  <body>
+    {% block navbar %}
+    <nav class="header-bar navbar navbar-default navbar-static-top">
+      <div class="content-bar">
+	{% if session.user %}
+	<div class="toolbar">
+	  <a id="btn-toggled" href="#" title="Toggle">
+	    <i class="fa fa-bars fa-2x"></i>
+	  </a>
+	  <a id="btn-toggled" href="#" title="Search" class="disabled">
+	    <i class="fa fa-search fa-2x"></i>
+	  </a>
+	</div>
+	<div id="navbar" class="navbar-collapse collapse">
+	  <ul class="nav navbar-nav navbar-right">
+	    <li class="nav">
+	      <p class="nav">{{ session.user.displayname }}</p>
+	    </li>
+	    <li class="nav dropdown">
+	      <a id="mavapa-apps-dropdown" href="#" class="nav dropdown-toggle" 
+		 data-toggle="dropdown" href="javascript:;">
+		<i class="fa fa-th fa-lg"></i>
+	      </a>
+	      <ul id="mavapa-apps-menu" class="dropdown-menu pull-right">
+	      </ul>
+	    </li>
+	    <li class="nav dropdown">
+	      <a id="morandu-dropdown" href="#" class="nav dropdown-toggle"
+		 data-toggle="dropdown" href="javascript:;">
+		<i class="fa fa-bell fa-lg"></i>
+	      </a>
+	      <ul id="morandu-notify" class="dropdown-menu pull-right">
+	      </ul>
+	    </li>
+	    <li class="nav dropdown profile">
+	      <a class="nav dropdown-toggle" data-toggle="dropdown" href="javascript:;">
+		<img class="img-circle" src="{{ session.user.avatar }}">
+	      </a>
+	      <ul class="dropdown-menu pull-right">
+		<li>
+		  <a href="{{ url_for('index') }}">
+		    <i class="fa fa-user fa-fw"></i>
+		    Profile
+		  </a>
+		</li>
+		{% if session.user.admin %}
+		<li>
+		  <a href="{{ url_for('index') }}">
+		    <i class="fa fa-cog fa-fw"></i>
+		    Administration
+		  </a>
+		</li>
+		{% endif %}
+		<li class="nav-divider"></li>
+		<li>
+		  <a href="{{ url_for('logout') }}">
+		    <i class="fa fa-sign-out-alt fa-fw"></i>
+		    Logout
+		  </a>
+		</li>
+	      </ul>
+	    </li>
+	  </ul>
+	</div>
+	{% endif %}
+      </div>
+    </nav>
+    {% endblock %}
+    {% block sidebar %}
+    <div class="sidebar navbar toggled" role="navigation">
+      <div class="logo">
+	<a href="{{ url_for('index') }}">
+	  <img src="{{ config['CDN_LOCAL'] }}/app/img/logo.png" alt="logo">
+	</a>
+      </div>
+      <div class="clearfix"></div>
+      <div class="profile"
+	   title="{{ session.user.displayname }}&#xA;{{ session.user.title }}">
+	<a href="{{ url_for('index') }}" alt="{{ session.user.displayname }}"></a>
+	<img class="img-circle fa" src="{{ session.user.avatar }}"/>
+	<div class="info hiddeable">
+	  <span class="displayname">{{ session.user.displayname }}</span>
+	  <span class="title">{{ session.user.title }}</span>
+	</div>
+      </div>
+      <div class="clearfix"></div>
+      <ul class="nav menu">
+	<li class="dropdown">
+	  <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+	     title="Monitoring">
+	    <i class="item fa fa-lg fa-heartbeat" aria-hidden="true"></i>
+	    <span class="hiddeable">Monitoring</span>
+	  </a>
+	  <ul class="dropdown-menu">
+	    <li>
+	      <a href="{{ url_for('capacity') }}" title="Capacity" data-toggle="tooltip">
+		<i class="fa fa-fw fa-binoculars" aria-hidden="true"></i>
+		<span>Capacity</span>
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{{ url_for('inventory') }}" title="Inventory" data-toggle="tooltip">
+		<i class="fa fa-fw fa-dolly" aria-hidden="true"></i>
+		<span>Inventory</span>
+	      </a>
+	    </li>
+	  </ul>
+	</li>
+	{% if session.user.admin %}
+	<li class="dropdown">
+	  <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+	     title="Administration">
+	    <i class="item fa fa-lg fa-cog" aria-hidden="true"></i>
+	    <span class="hiddeable">Administration</span>
+	  </a>
+	  <ul class="dropdown-menu">
+	    <li>
+	      <a href="{{ url_for('index', mod='users') }}">
+		<i class="fa fa-fw fa-users" aria-hidden="true"></i>
+		<span>Users</span>
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{{ url_for('index', mod='modules') }}">
+		<i class="fa fa-fw fa-cogs" aria-hidden="true"></i>
+		<span>Modules</span>
+	      </a>
+	    </li>
+	    <li>
+    	      <a href="{{ url_for('index', mod='settings') }}">
+    		<i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
+    		<span>Settings</span>
+    	      </a>
+	    </li>
+	    <li>
+    	      <a href="{{ url_for('index', mod='authentication') }}">
+    		<i class="fa fa-fw fa-database" aria-hidden="true"></i>
+    		<span>Authentication</span>
+    	      </a>
+	    </li>
+	    <li>
+    	      <a href="{{ url_for('index', mod='plugins') }}">
+    		<i class="fa fa-fw fa-plug" aria-hidden="true"></i>
+    		<span>Plugins</span>
+    	      </a>
+	    </li>
+	    <li class="disabled">
+    	      <a href="{{ url_for('index', mod='information') }}">
+    		<i class="fa fa-fw fa-info" aria-hidden="true"></i>
+    		<span>Information</span>
+    	      </a>
+	    </li>
+	  </ul>
+	</li>
+	{% endif %}
+      </ul>
+      <div class="footer">
+	<a data-toggle="tooltip" data-placement="top" title="Profile"
+	   href="{{ url_for('index') }}" class="hiddeable">
+	  <i class="fa fa-fw fa-user"></i>
+	</a>
+	<a data-toggle="tooltip" data-placement="top" title="Logout"
+	   href="{{ url_for('logout') }}">
+	  <i class="fa fa-fw fa-sign-out-alt"></i>
+	</a>
+      </div>
+    </div>
+    {% endblock %}
+      
+    <div class="wrapper">
+      {% block body %}{% endblock %}
+      
+      <div class="alert-container">
+	{% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="alert alert-message alert-{{ category }} fade in">
+	  <button type="button" class="close" data-dismiss="alert" style="outline: none;">&times;</button>
+	  {% if category == 'success' %}
+	  <i class="fa fa-check-circle"></i>
+	  {% elif category in ['danger', 'warning'] %}
+	  <i class="fa fa-exclamation-circle"></i>
+	  {% else %}
+	  <i class="fa fa-info-circle"></i>
+          {% endif %}
+	  {{ message|safe }}
+	</div>
+	{% endfor%}
+      </div>
+      {% block modals %}{% endblock %}
+    </div>
+    {% block footer %}
+    <div class="footer-bar">
+      <div class="content-bar">
+	<ul class="links">
+	  <span>
+	    <small>©&nbsp; 2016</small>
+	  </span>
+	  <li>
+	    <a href="#"><small>Developers</small></a>
+	  </li>
+	  <li>
+	    <a href="#"><small>Support</small></a>
+	  </li>
+	  <li>
+	    <a href="#"><small>Privacy</small></a>
+	  </li>
+	  <li>
+	    <a href="#"><small>Terms</small></a>
+	  </li>
+	</ul>
+      </div>
+    </div>
+    {% endblock %}
+  </body>
+
+  <script src="{{ config['CDN_JQUERY'] }}/jquery.min.js"></script>
+  <script src="{{ config['CDN_BOOTSTRAP'] }}/js/bootstrap.min.js"></script>
+  <!-- <script src="{{ config['CDN_MAVAPA'] }}/mavapa.js"></script> -->
+  <script>
+    $(document).ready(function () {
+	$('#btn-toggled').click(function(e) {
+	    e.preventDefault();
+	    $('.sidebar').toggleClass("toggled");
+	    $('.header-bar').toggleClass("toggled");
+	    $('.wrapper').toggleClass("toggled");
+	    $('.footer-bar').toggleClass("toggled");
+	    $('.table').bootstrapTable('resetView');
+	});
+    });
+  </script>
+  {% block scripts %}
+  {% endblock%}
+</html>

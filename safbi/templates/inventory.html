@@ -1,0 +1,387 @@
+{% extends "base.html" %}
+
+{% block title %}Inventory{% endblock %}
+
+{% block body %}
+<div class="inventory-header section-header">
+  <div class="title">
+    <i class="fa fa-fw fa-dolly" aria-hidden="true"></i>
+    Inventory
+  </div>
+</div>
+<div class="inventory-content section-content" style="padding: 0% 1%;">
+  <div id="inventory-toolbar" class="toolbar" style="max-height: 10%;padding: 0.5% 0%;">
+    <button class="btn btn-primary" type="button" data-toggle="modal"
+	    id="inventory-filter" aria-haspopup="true" aria-expanded="false">
+      <i class="fa fa-fw fa-filter"></i>
+    </button>
+  </div>
+  <table id="inventory-table"
+         data-show-toggle="false" data-show-export="false"
+         data-show-columns="true" data-show-multi-sort="true"
+         data-sort-name="id" data-pagination="true" data-only-info-pagination="true"
+         data-toggle="table" data-search="true"
+         data-show-footer="false" data-page-size="50"
+         data-escape="false" data-side-pagination="server"
+	 data-query-params="InventoryParams"
+	 data-show-refresh="true" data-show-header="true"
+	 data-url="{{ url_for('api_inventory') }}?"
+	 data-response-handler="InventoryResponseHandler"
+	 data-toolbar="#inventory-toolbar" data-row-style="InventoryRowStyle"
+	 data-reorderable-columns="true" data-show-pagination-switch="false"
+	 data-detail-view="true"
+	 data-detail-formatter="InventoryDetailFormatter"
+         class="table-hover table-striped table-compact table-responsive
+                table-condensed table-autosize">
+    <thead>
+      <tr>
+	<th data-field="name" data-valign="middle"
+	    data-align="left" data-sortable="true"
+	    data-formatter="InventoryFormatterName">
+          <i class="fa fa-fw fa-list"></i>
+          Name
+        </th>
+        <th data-field="chassis" data-align="left" data-halign="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterChassis">
+          <i class="fa fa-fw fa-list-ul"></i>
+          Chassis
+        </th>
+        <th data-field="serial" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterSerial">
+          <i class="fa fa-fw fa-list-ol"></i>
+          Serial
+	</th>
+        <th data-field="hardware" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterHardware">
+          <i class="fa fa-fw fa-clipboard-check"></i>
+          Hardware
+	</th>
+        <th data-field="software" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterSoftware">
+          <i class="fa fa-fw fa-clipboard-check"></i>
+          Software
+	</th>
+        <th data-field="actions" data-align="center" 
+	    data-valign="middle"
+	    data-formatter="InventoryFormatterActions">
+          <i class="fa fa-fw fa-cogs"></i>
+          Actions
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% endblock %}
+
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+
+<script>
+    $(document).ready(function () {
+	$(window).resize(function () {
+            autosize_tables();
+	    jqlisteners();
+	});
+	$("select[id=customer]").on('loaded.bs.select', function (e) {
+	    load_select_customers($(this));
+	});
+	$("select[id=manager]").on('loaded.bs.select', function (e) {
+	    load_select_users($(this));
+	});
+	$("select[id=parent]").on('loaded.bs.select', function (e) {
+	    load_select_projects($(this));
+	});
+	autosize_tables();
+	jqlisteners();
+    });
+function jqlisteners() {
+    /* jqlisteners_project(); */
+    console.log('refresh');
+}
+function autosize_tables(selected) {
+    if ( selected == null || selected === '' ) {
+	var tables = $('body').find(".table-autosize");
+    } else {
+	var tables = $('body').find(selected);
+    }
+    tables.each(function(row){
+	var selector = $(tables[row]).attr('id');
+	selector = '#' + selector;
+	$(selector).on('post-body.bs.table', function () {
+	    jqlisteners();
+	});
+	$(selector).bootstrapTable({
+            height: table_height(selector),
+	});
+	$(selector).bootstrapTable('resetView', {
+            height: table_height(selector),
+	});
+    });
+}
+function table_height(table) {
+    var parent = $(table).parent().parent().parent().parent();
+    return parent.height();
+};
+function humanSize(bytes, si=false) {
+    var thresh = si ? 1000 : 1024;
+    if(Math.abs(bytes) < thresh) {
+	return bytes + ' B';
+    }
+    var units = si
+        ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
+        : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
+    var u = -1;
+    do {
+	bytes /= thresh;
+	++u;
+    } while(Math.abs(bytes) >= thresh && u < units.length - 1);
+    return bytes.toFixed(1)+' '+units[u];
+}
+function InventoryParams(params) {
+    return params
+}
+function InventoryResponseHandler(res) {
+    var data = [];
+    for(r in res.data) {
+	var row = res.data[r];
+	if (row.inventory.hardware_full) {
+	    row.inventory.hardware_full = JSON.parse(row.inventory.hardware_full);
+	}
+	if (row.inventory.software_full) {
+	    row.inventory.software_full = JSON.parse(row.inventory.software_full);
+	}	
+	data.push({
+	    id: row.hostid,
+	    name: row.host,
+	    hw: row.inventory.hardware_full,
+	    sw: row.inventory.software_full,
+	    status: row.status,
+	    available: row.available,
+	});
+    };
+    return {
+	total: res.total,
+	rows: data,
+    }
+}
+function InventoryRowStyle(row, index) {
+    return {}
+}
+function InventoryFormatterName(value, row) {
+    html ='<span>'
+    if ( row.hw.type == 'virtual' ) {
+	html+='<i class="fa fa-fw fa-box"></i> ';
+    } else if ( row.hw.type == 'physical' ) {
+	html+='<i class="fa fa-fw fa-server"></i> ';
+    } else {
+	html+='<i class="fa fa-fw fa-question"></i> ';
+    }
+    html+=value;
+    html+='<img class="fa fa-fw pull-right" src="/safbi/static/extras/services/img/zabbix.png"/>';
+    html+='</span>';
+    return html
+}
+function InventoryFormatterChassis(value, row) {
+    return row.hw.chassis
+}
+function InventoryFormatterSerial(value, row) {
+    return row.hw.serial
+}
+function InventoryFormatterSoftware(value, row) {
+    var content = [];
+    if ( row.sw.family == 'Linux' ) {
+	content.push({ type: 'i',
+		       class: 'fab fa-fw fa-linux',
+		       data: '',
+		       tooltip: row.sw.release
+		     })
+    } else if ( row.sw.family == 'Windows' ) {
+	content.push({ type: 'i',
+		       class: 'fab fa-fw fa-windows',
+		       data: '',
+		       tooltip: row.sw.release
+		     })
+    }
+    if ( row.sw.apps ) {
+	if ( row.sw.apps.kvm ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/kvm.png',
+    			   data: row.sw.apps.kvm.domains.length,
+    			   tooltip: row.sw.apps.kvm.node.version_hv
+    			 })
+	}
+    	if ( row.sw.apps.redis ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/redis.png',
+    			   data: row.sw.apps.redis.databases,
+    			   tooltip: row.sw.apps.redis.version
+    			 })
+    	}
+    	if ( row.sw.apps.elastic ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/elastic.png',
+    			   data: row.sw.apps.elastic.indices,
+    			   tooltip: row.sw.apps.elastic.version
+    			 })
+    	}
+    	if ( row.sw.apps.arango ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/arango.jpg',
+			   data: '',
+    			   tooltip: row.sw.apps.arango.version
+    		     })
+    	}
+    	if ( row.sw.apps.springboot ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/springboot.png',
+    			   data: row.sw.apps.springboot.length,
+    			   tooltip: 'Applications: ' + row.sw.apps.springboot.length
+    			 })
+    	}
+    	if ( row.sw.apps.mysql ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/mysql.png',
+    			   data: row.sw.apps.mysql.databases,
+    			   tooltip: row.sw.apps.mysql.version
+    			 })
+    	}
+    	if ( row.sw.apps.postgres ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/postgres.png',
+    			   data: row.sw.apps.postgres.databases,
+    			   tooltip: row.sw.apps.postgres.version
+    			 })
+    	}
+	if ( row.sw.apps.openldap ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/openldap.png',
+			   data: '',
+    			   tooltip: row.sw.apps.openldap.version
+    			 })
+    	}
+	if ( row.sw.apps.logstash ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/logstash.png',
+			   data: '',
+    			   tooltip: row.sw.apps.logstash.version
+    			 })
+    	}
+	if ( row.sw.apps.jenkins ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/jenkins.png',
+			   data: '',
+    			   tooltip: row.sw.apps.jenkins.version
+    			 })
+    	}
+    }
+    html = '';
+    for (index=0; index < content.length; index++) {
+	if ( index > 0 && index < content.length ) {
+	    html+='<i class="fa fa-fw fa-ellipsis-v"></i>';
+	}
+	if ( content[index]['type'] == 'i' ) {
+	    html+='<span title="' + content[index]['tooltip'] + '">';
+	    html+='<i class="' + content[index]['class'] + '"></i>';
+	    html+=content[index]['data'] + '</span>';
+	} else if ( content[index]['type'] == 'img' ) {
+	    html+='<span title="' + content[index]['tooltip'] + '">';
+	    html+='<img class="' + content[index]['class'];
+	    html+='" src="' + content[index]['src'] + '"/> ';
+	    html+=content[index]['data'] + '</span>';	    
+	}
+    }
+    return html
+}
+function InventoryFormatterHardware(value, row) {
+    html = ''
+    if ( row.hw.cpu_count ) {
+	html+='<span><i class="fa fa-fw fa-microchip"></i> ' + row.hw.cpu_count  + '</span>';
+	html+='<i class="fa fa-fw fa-ellipsis-v"></i>';
+    }
+    if ( row.hw.memory ) {
+	html+='<span><i class="fa fa-fw fa-memory"></i> ' + humanSize(row.hw.memory) + '</span>';
+	html+='<i class="fa fa-fw fa-ellipsis-v"></i>';
+    }
+    if ( row.hw.blockdevices ) {
+	html+='<span><i class="far fa-fw fa-hdd"></i> ' + row.hw.blockdevices.length + '</span> ';
+    }
+    return html
+}
+function InventoryFormatterActions(value, row) {
+    html ='<a class="host-monitor" data-toggle="confirmation" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="#host-monitor">';
+    if ( row.status == 1 ) {
+	html+=' <i class="fa fa-fw fa-exclamation-triangle" style="color:#9b5555"></i>';
+    } else if ( row.available == 0 ) {
+	html+=' <i class="fa fa-fw fa-question-circle" style="color:#6c6d6c"></i>';
+    } else {
+	html+=' <i class="fa fa-fw fa-check-circle" style="color:#619b55"></i>';
+    }
+    html+='</a>';
+    html+='<a class="host-open" data-toggle="confirmation" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="#host-open">';
+    html+=' <i class="fa fa-fw fa-search"></i>';
+    html+='</a>';
+    html+='<a class="host-delete" data-toggle="confirmation" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="#host-delete">';
+    html+=' <i class="fa fa-fw fa-trash"></i>';
+    html+='</a>';
+    return html;
+}
+function InventoryDetailFormatter(index, row) {
+    html ='<div class="table-detail-row list-group-item row">'
+    html+=' <a class="table-detail-link" href="{{ url_for("inventory") }}/' + row['id'] + '"></a>';
+    html+=' <div class="col-md-2 col-height-full">';
+    html+='  <div class="progress-circle p' + row['progress'] + '"' + '>';
+    html+='   <span>'+ row['progress'] +'</span>';
+    html+='   <div class="left-half-clipper">';
+    html+='    <div class="first50-bar"></div>';
+    html+='    <div class="value-bar"></div>';
+    html+='   </div>';
+    html+='  </div>';
+    html+=' </div>';
+    html+=' <div class="col-md-7">';
+    html+='  <h2 class="list-group-item-heading">' + row.name + '</h2>';
+    html+='  <h4 class="list-group-item-heading">';
+    html+='   <img class="fa fa-fw img-circle" src="' + row.owner + '"/> ';
+    html+=    row.owner;
+    html+='  </h4>';
+    html+='  <p class="list-group-item-text">' + row['description'] + '</p>';
+    html+=' </div>';
+    html+=' <div class="col-md-3 col-height-middle text-center">';
+    html+='  <h4 style="margin:2%;">' + row['members'] + ' <small>members</small>' + '</h4>';
+    html+='  <h3 style="margin:5%;">';
+    html+='   <img class="fa fa-fw img-circle" src="' + row['customer_logo'] + '"/> ';
+    html+=    row['customer'];
+    html+='  </h3>'
+    html+='  <h4 style="margin: 2%;">';
+    html+=    row['changes_open'] + ' / ' + row['changes'] + ' <small>changes</small>';
+    html+='  </h4>';
+    html+=' </div>';
+    html+='</div>';
+    return html;
+}
+</script>
+{% endblock %}

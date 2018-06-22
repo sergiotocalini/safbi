@@ -1,0 +1,153 @@
+<div class="wizard" id="wizard-alloc" data-title="Allocation">
+    <div class="wizard-card" data-cardname="properties" style="height:100%;padding:2% 5% 0.5% 5%;">
+      <h3 style="height:10%;margin-bottom:2%">Properties</h3>
+      <p style="height:7%;margin-bottom:1%">
+	Define the properties for the new virtual machine.
+      </p>
+      <div style="height:68%;margin:0px">
+	<table id="table-properties"
+	       data-toggle="table" data-search="false"
+	       data-show-footer="false" data-escape="false"
+	       data-show-header="false" 
+	       class="table-hover table-striped table-compact table-responsive
+		      table-condensed table-autosize">
+	  <thead>
+	    <tr>
+	      <th data-field="attr" data-valign="middle"
+		  data-align="left" data-sortable="false">
+	      </th>
+	      <th data-field="value" data-valign="middle"
+		  data-align="left" data-sortable="false">
+	      </th>
+	    </tr>
+	    <tbody>
+	      <tr class="required">
+		<td>
+		  <span style="padding-left:5%">
+		    <i class="fa fa-fw fa-microchip"></i>
+		    * vCPU
+		  </span>
+		</td>
+		<td>
+		  <div class="input-group">
+		    <input type="text" id="cpu" name="cpu"
+			   class="form-control col-md-4"
+			   placeholder="1"/>
+		  </div>
+		</td>
+	      </tr>
+	      <tr>
+		<td>
+		  <span style="padding-left:5%">
+		    <i class="fa fa-fw fa-memory"></i>
+		    * Memory
+		  </span>
+		</td>
+		<td>
+		  <div class="input-group">
+		      <input type="text" id="mem" name="mem"
+			     class="form-control col-md-4"
+			     placeholder="2"/>
+		      <!-- <select name="mem_units" class="selectpicker form-control"> -->
+		      <!-- 	<option value="KiB">KiB</option> -->
+		      <!-- 	<option value="MiB">MiB</option> -->
+		      <!-- 	<option value="GiB">GiB</option> -->
+		      <!-- 	<option value="TiB">TiB</option> -->
+		      <!-- </select> -->
+		  </div>
+		</td>
+	      </tr>
+	      <tr>
+		<td>
+		  <span style="padding-left:5%">
+		    <i class="fa fa-fw fa-hdd"></i>
+		    * Hard disk
+		  </span>
+		</td>
+		<td>
+		  <div class="input-group">
+		    <input type="text" id="hdd00" name="hdd"
+			   class="form-control col-md-4"
+			   placeholder="20"/>
+		    <!-- <select name="hdd_units" class="selectpicker form-control"> -->
+		    <!-- 	<option value="KiB">KiB</option> -->
+		    <!-- 	<option value="MiB">MiB</option> -->
+		    <!-- 	<option value="GiB">GiB</option> -->
+		    <!-- 	<option value="TiB">TiB</option> -->
+		    <!-- </select> -->
+		  </div>
+		</td>
+	      </tr>
+	    </tbody>
+	</table>
+      </div>
+      <div class="properties-toolbar" style="height:10%">
+	
+      </div>
+    </div>
+    
+    <div class="wizard-card" data-cardname="hosts" style="height:100%;padding:2% 5% 0.5% 5%;">
+      <h3 style="height:10%;margin-bottom:2%">Compute Resource</h3>
+      <p style="height:7%;margin-bottom:1%">
+	Select the destination compute resource for the virtual machine.
+      </p>
+      <div style="height:78%">
+	  <table id="table-hosts"
+		 data-toggle="table" data-search="true" data-advance-search="true"
+		 data-pagination="false" data-sort-name="score" data-sort-order="desc"
+		 data-show-footer="false" data-escape="false"
+		 data-show-header="true" data-single-select="true"
+		 data-only-info-pagination="true" data-side-pagination="client"
+		 class="table-hover table-striped table-compact table-responsive
+			table-condensed table-autosize">
+	    <thead>
+	      <tr>
+		<th data-field="check" data-valign="middle"
+		    data-align="center" data-radio="true"
+		    data-formatter="HostsCheckFormatter">
+		  <i class="fa fa-fw fa-check"></i>
+		</th>
+		<th data-field="score" data-valign="middle"
+		    data-align="center" data-sortable="false"
+		    data-formatter="HostsScoreFormatter">
+		  <i class="fa fa-fw fa-star"></i>
+		  Score
+		</th>
+		<th data-field="host" data-valign="middle"
+		    data-align="left" data-sortable="false">
+		  <i class="fa fa-fw fa-server"></i>
+		  Host
+		</th>
+	      </tr>
+	      <tbody>
+	      </tbody>
+	  </table>
+	</div>
+
+    </div>
+
+    <div class="wizard-error">
+      <div class="alert alert-error">
+	<strong>There was a problem</strong> with your submission.
+	Please correct the errors and re-submit.
+      </div>
+    </div>
+
+    <div class="wizard-failure">
+      <div class="alert alert-error">
+	<strong>There was a problem</strong> submitting the form.
+	Please try again in a minute.
+      </div>
+    </div>
+
+    <div class="wizard-success">
+      <div class="alert alert-success">
+	<span class="create-server-name"></span>Server Created <strong>Successfully.</strong>
+      </div>
+
+      <a class="btn btn-default create-another-server">Create another server</a>
+      <span style="padding:0 10px">or</span>
+      <a class="btn btn-success im-done">Done</a>
+    </div>
+  </div>
+</div>
