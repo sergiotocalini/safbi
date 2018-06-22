@@ -59,7 +59,7 @@ def admin_required(f):
 
 @db_session
 def post_login():
-    user = get_data('User', userid=session['user']['id'])
+    user = get_data('User', userid=session['user'].get('id', ''))
     if not user:
         user = User(userid=session['user']['id'],
                     email=session['user']['email'],
