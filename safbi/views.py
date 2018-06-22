@@ -59,7 +59,7 @@ def admin_required(f):
 
 @db_session
 def post_login():
-    user = get_data('User', userid=session['user'].get('id', ''))
+    user = get_data('User', userid=session['user']['id'])
     if not user:
         user = User(userid=session['user']['id'],
                     email=session['user']['email'],
@@ -105,9 +105,7 @@ def before_request():
             session['user']['admin'] = user.admin
             session['user']['status'] = user.status
         else:
-            post_login()
-        # else:
-        #     return redirect(url_for('logout'))
+            logout()
 
 @db_session
 def get_data(table, **kwargs):
@@ -126,17 +124,23 @@ def login():
 #   return redirect(url_for('mavapa.login', next=request.url))
     if not session.get('user'):
         if request.method == 'POST':
-            session['user'] = {}
-            session['user']['email'] = request.form['email']
-            session['user']['status'] = True
-            session['user']['admin'] = True
-            session['access_token'] = 1231543656
-            next_url = session.pop('next_url', None)
-            if next_url is None:
-                next_url = request.args.get("next")
+            user = get_data('User', email=request.form['email'])
+            if user:
+                session['user'] = {}
+                session['user']['displayname'] = user.displayname
+                session['user']['id'] = user.id
+                session['user']['title'] = user.title
+                session['user']['avatar'] = user.avatar
+                session['user']['admin'] = user.admin
+                session['user']['status'] = user.status
+                session['user']['email'] = user.email
+                session['access_token'] = 1231543656
+                next_url = session.pop('next_url', None)
                 if next_url is None:
-                    next_url = url_for('index')
-            return redirect(urllib.unquote(next_url))
+                    next_url = request.args.get("next")
+                    if next_url is None:
+                        next_url = url_for('index')
+                return redirect(urllib.unquote(next_url))
         return render_template('login.html')
     else:
         next_url = session.pop('next_url', None)
@@ -150,6 +154,7 @@ def login():
 def logout():
 #    return redirect(url_for('mavapa.logout'))
     session.pop('user', None)
+    session.pop('access_token', None)
     return redirect(url_for('login'))
 
 @app.route('/unauthorized')
