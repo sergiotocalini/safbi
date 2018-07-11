@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Inventory{% endblock %}
+{% block title %}Monitoring: Inventory{% endblock %}
 
 {% block body %}
 <div class="inventory-header section-header">
   <div class="title">
     <i class="fa fa-fw fa-dolly" aria-hidden="true"></i>
-    Inventory
+    Monitoring: Inventory
   </div>
 </div>
 <div class="inventory-content section-content" style="padding: 0% 1%;">
@@ -35,6 +35,12 @@
                 table-condensed table-autosize">
     <thead>
       <tr>
+	<th data-field="site" data-valign="middle"
+	    data-align="center" data-sortable="true"
+	    data-formatter="InventoryFormatterSite">
+          <i class="fa fa-fw fa-building"></i>
+          Site
+        </th>
 	<th data-field="name" data-valign="middle"
 	    data-align="left" data-sortable="true"
 	    data-formatter="InventoryFormatterName">
@@ -42,7 +48,7 @@
           Name
         </th>
         <th data-field="chassis" data-align="left" data-halign="center" 
-	    data-valign="middle" data-sortable="true"
+	    data-valign="middle" data-sortable="true" data-visible="false"
 	    data-formatter="InventoryFormatterChassis">
           <i class="fa fa-fw fa-list-ul"></i>
           Chassis
@@ -65,11 +71,10 @@
           <i class="fa fa-fw fa-clipboard-check"></i>
           Software
 	</th>
-        <th data-field="actions" data-align="center" 
+	<th data-field="actions" data-align="center" 
 	    data-valign="middle"
 	    data-formatter="InventoryFormatterActions">
-          <i class="fa fa-fw fa-cogs"></i>
-          Actions
+          <i class="fa fa-fw fa-user-cog"></i>
         </th>
       </tr>
     </thead>
@@ -179,6 +184,9 @@ function InventoryResponseHandler(res) {
 function InventoryRowStyle(row, index) {
     return {}
 }
+function InventoryFormatterSite(value, row) {
+    return row.hw.site
+}
 function InventoryFormatterName(value, row) {
     html ='<span>'
     if ( row.hw.type == 'virtual' ) {
@@ -189,7 +197,25 @@ function InventoryFormatterName(value, row) {
 	html+='<i class="fa fa-fw fa-question"></i> ';
     }
     html+=value;
-    html+='<img class="fa fa-fw pull-right" src="/safbi/static/extras/services/img/zabbix.png"/>';
+    html+='</span>';
+    html+='<span class="pull-right">'
+    html+=' <img class="fa fa-fw" src="/safbi/static/extras/services/img/zabbix.png"/>';
+    if ( row.sw.env == 'PROD' ) {
+	html+=' <i class="fa fa-fw fa-flag status-red"></i>';
+    } else if ( row.sw.env == 'TEST' ) {
+	html+=' <i class="fa fa-fw fa-flag status-yellow"></i>';
+    } else if ( row.sw.env == 'STAGE' ) {
+	html+=' <i class="fa fa-fw fa-flag status-blue"></i>';	
+    } else {
+	html+=' <i class="fa fa-fw fa-flag status-gray"></i>';
+    }
+    if ( row.status == 1 ) {
+	html+=' <i class="fa fa-fw fa-exclamation-triangle status-red"></i>';
+    } else if ( row.available == 0 ) {
+	html+=' <i class="fa fa-fw fa-question-circle status-gray"></i>';
+    } else {
+	html+=' <i class="fa fa-fw fa-check-circle status-green"></i>';
+    }
     html+='</span>';
     return html
 }
@@ -199,6 +225,11 @@ function InventoryFormatterChassis(value, row) {
 function InventoryFormatterSerial(value, row) {
     return row.hw.serial
 }
+// function InventoryFormatterInstalled(value, row) {
+//     if (row.sw.installed) {
+// 	return moment.unix(row.sw.installed).format("YYYY-MM-DD hh:mm");
+//     }
+// }
 function InventoryFormatterSoftware(value, row) {
     var content = [];
     if ( row.sw.family == 'Linux' ) {
@@ -330,17 +361,7 @@ function InventoryFormatterHardware(value, row) {
     return html
 }
 function InventoryFormatterActions(value, row) {
-    html ='<a class="host-monitor" data-toggle="confirmation" ';
-    html+='   data-host="' + row.id + '" data-container="body" href="#host-monitor">';
-    if ( row.status == 1 ) {
-	html+=' <i class="fa fa-fw fa-exclamation-triangle" style="color:#9b5555"></i>';
-    } else if ( row.available == 0 ) {
-	html+=' <i class="fa fa-fw fa-question-circle" style="color:#6c6d6c"></i>';
-    } else {
-	html+=' <i class="fa fa-fw fa-check-circle" style="color:#619b55"></i>';
-    }
-    html+='</a>';
-    html+='<a class="host-open" data-toggle="confirmation" ';
+    html ='<a class="host-open" data-toggle="confirmation" ';
     html+='   data-host="' + row.id + '" data-container="body" href="#host-open">';
     html+=' <i class="fa fa-fw fa-search"></i>';
     html+='</a>';
@@ -352,20 +373,14 @@ function InventoryFormatterActions(value, row) {
 }
 function InventoryDetailFormatter(index, row) {
     html ='<div class="table-detail-row list-group-item row">'
-    html+=' <a class="table-detail-link" href="{{ url_for("inventory") }}/' + row['id'] + '"></a>';
+//    html+=' <a class="table-detail-link" href="/"></a>';
     html+=' <div class="col-md-2 col-height-full">';
-    html+='  <div class="progress-circle p' + row['progress'] + '"' + '>';
-    html+='   <span>'+ row['progress'] +'</span>';
-    html+='   <div class="left-half-clipper">';
-    html+='    <div class="first50-bar"></div>';
-    html+='    <div class="value-bar"></div>';
-    html+='   </div>';
-    html+='  </div>';
+    html+='  <i class="fab fa-4x fa-linux"></i>'
     html+=' </div>';
     html+=' <div class="col-md-7">';
     html+='  <h2 class="list-group-item-heading">' + row.name + '</h2>';
     html+='  <h4 class="list-group-item-heading">';
-    html+='   <img class="fa fa-fw img-circle" src="' + row.owner + '"/> ';
+    html+='   <img class="fa fa-fw img-circle" src="/safbi/static/app/img/avatar.png"/> ';
     html+=    row.owner;
     html+='  </h4>';
     html+='  <p class="list-group-item-text">' + row['description'] + '</p>';
@@ -373,7 +388,7 @@ function InventoryDetailFormatter(index, row) {
     html+=' <div class="col-md-3 col-height-middle text-center">';
     html+='  <h4 style="margin:2%;">' + row['members'] + ' <small>members</small>' + '</h4>';
     html+='  <h3 style="margin:5%;">';
-    html+='   <img class="fa fa-fw img-circle" src="' + row['customer_logo'] + '"/> ';
+    html+='   <img class="fa fa-fw img-circle" src="/safbi/static/app/img/avatar.png"/> ';
     html+=    row['customer'];
     html+='  </h3>'
     html+='  <h4 style="margin: 2%;">';

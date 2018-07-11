@@ -29,9 +29,9 @@
 		  </span>
 		</td>
 		<td>
-		  <div class="input-group">
+		  <div class="input-group col-md-4">
 		    <input type="text" id="cpu" name="cpu"
-			   class="form-control col-md-4"
+			   class="form-control"
 			   placeholder="1"/>
 		  </div>
 		</td>
@@ -44,17 +44,21 @@
 		  </span>
 		</td>
 		<td>
-		  <div class="input-group">
-		      <input type="text" id="mem" name="mem"
-			     class="form-control col-md-4"
-			     placeholder="2"/>
-		      <!-- <select name="mem_units" class="selectpicker form-control"> -->
-		      <!-- 	<option value="KiB">KiB</option> -->
-		      <!-- 	<option value="MiB">MiB</option> -->
-		      <!-- 	<option value="GiB">GiB</option> -->
-		      <!-- 	<option value="TiB">TiB</option> -->
-		      <!-- </select> -->
+		  <div class="input-group col-md-4" style="float:left">
+		    <input type="text" id="mem" name="mem"
+			   class="form-control"
+			   placeholder="2"/>
 		  </div>
+		  <div class="input-group col-md-2" style="float:left;margin-left:1%;z-index:1">
+		    <div class="input-group-field">
+		      <select id="mem_units" name="mem_units" class="form-control selectpicker">
+			<option>KiB</option>
+			<option>MiB</option>
+			<option selected>GiB</option>
+			<option>TiB</option>
+		      </select>
+		    </div>
+		  </div>		  
 		</td>
 	      </tr>
 	      <tr>
@@ -64,17 +68,21 @@
 		    * Hard disk
 		  </span>
 		</td>
-		<td>
-		  <div class="input-group">
-		    <input type="text" id="hdd00" name="hdd"
-			   class="form-control col-md-4"
-			   placeholder="20"/>
-		    <!-- <select name="hdd_units" class="selectpicker form-control"> -->
-		    <!-- 	<option value="KiB">KiB</option> -->
-		    <!-- 	<option value="MiB">MiB</option> -->
-		    <!-- 	<option value="GiB">GiB</option> -->
-		    <!-- 	<option value="TiB">TiB</option> -->
-		    <!-- </select> -->
+		<td>		  
+		  <div class="input-group col-md-4" style="float:left">
+		    <input type="text" id="hdd" name="hdd"
+			   class="form-control" 
+			   placeholder="20">
+		  </div>
+		  <div class="input-group col-md-2" style="float:left;margin-left:1%;z-index:1">
+		    <div class="input-group-field">
+		      <select id="hdd_units" name="hdd_units" class="form-control selectpicker">
+			<option>KiB</option>
+			<option>MiB</option>
+			<option selected>GiB</option>
+			<option>TiB</option>
+		      </select>
+		    </div>
 		  </div>
 		</td>
 	      </tr>

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Capacity{% endblock %}
+{% block title %}Monitoring: Capacity{% endblock %}
 
 {% block body %}
 <div class="section-refresh fade in disabled"
@@ -11,7 +11,7 @@
 <div class="capacity-header section-header">
   <div class="section-title title">
     <i class="fa fa-fw fa-binoculars" aria-hidden="true"></i>
-    Capacity
+    Monitoring: Capacity
   </div>
   <div class="section-toolbar toolbar pull-right">
     <a data-init="true" href="#reload" data-click="section-reload"
@@ -146,6 +146,25 @@
     position: absolute;
     transform: translateY(-50%) translateX(-50%);
 }
+/* .input-group-field { */
+/*     display: table-cell; */
+/*     vertical-align: middle; */
+/*     border-radius:4px; */
+/* } */
+/* .input-group-field .form-control, .input-group-field .form-control { */
+/*     border-radius: inherit !important; */
+/* } */
+/* .input-group-field:not(:first-child):not(:last-child) { */
+/*     border-radius:0; */
+/* } */
+/* .input-group-field:not(:first-child):not(:last-child) .form-control { */
+/*     border-left-width: 0; */
+/*     border-right-width: 0; */
+/* } */
+/* .input-group-field:last-child { */
+/*     border-top-left-radius:0; */
+/*     border-bottom-left-radius:0; */
+/* } */
 </style>
 
 <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" type="text/javascript"></script>
@@ -175,13 +194,14 @@
 <link  href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
 
-<link  href="{{ config['CDN_LOCAL'] }}/extras/bootstrap-select/1.12.4/css/bootstrap-select.min.css" rel="stylesheet">
-<script src="{{ config['CDN_LOCAL'] }}/extras/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+<link  href="{{ config['CDN_LOCAL'] }}/extras/bootstrap-select/1.10.1/css/bootstrap-select.min.css" rel="stylesheet">
+<script src="{{ config['CDN_LOCAL'] }}/extras/bootstrap-select/1.10.1/js/bootstrap-select.min.js"></script>
 
 <script>
 $(document).ready(function () {
-    var details_data = [];
-    var graph_overview_perf = c3.generate({
+    var objects = {}
+    objects['data'] = [];
+    objects['graph_perf'] = c3.generate({
 	bindto: '#graph-overview-perf',
 	data: {
 	    type: 'gauge',
@@ -243,9 +263,11 @@ $(document).ready(function () {
     });
 
     wizard.on("reset", function() {
-	wizard.modal.find(':input').val('').removeAttr('disabled');
-	wizard.modal.find('.form-group').removeClass('has-error').removeClass('has-succes');
-	wizard.modal.find('#fqdn').data('is-valid', 0).data('lookup', 0);
+	$(".selectpicker").selectpicker("destroy");
+	$(".selectpicker").selectpicker("refresh");
+	// wizard.modal.find(':input').val('').removeAttr('disabled');
+	// wizard.modal.find('.form-group').removeClass('has-error').removeClass('has-succes');
+	// wizard.modal.find('#fqdn').data('is-valid', 0).data('lookup', 0);
     });
 
     wizard.on("submit", function(wizard) {
@@ -271,9 +293,19 @@ $(document).ready(function () {
     
     wizard.on("incrementCard", function(wizard) {
 	var options = wizard.serializeArray();
+	console.log(options);
 	if ( wizard.getActiveCard()["name"] == 'hosts' ) {
+	    // for (opt in options) {
+	    // 	if ( /^(mem|hdd.*)$/.test(options[opt]['name']) ) {
+	    // 	    var units = $('#' + options[opt]['name'] + '_units').find("option:selected");
+	    // 	    var units_value = units.val();
+	    // 	    console.log(units_value);
+	    // 	    options[opt]['value']=Size2Bytes(options[opt]['value'], units_value);
+	    // 	}
+	    // }
+	    console.log(options);
 	    autosize_tables('#table-hosts');
-	    $('#table-hosts').bootstrapTable('load', HostsScoreCalc(details_data, options));
+	    $('#table-hosts').bootstrapTable('load', HostsScoreCalc(objects['data'], options));
 	}
     });
 
@@ -292,16 +324,15 @@ $(document).ready(function () {
     $(document).on("click", "[data-click=section-simulation]", function(a) {
 	a.preventDefault();
 	wizard.show();
-	wizard.reset();
     });
     
     setTimeout(function () {
-	var data = fetch_data();
-	if ( data.length > 0 ) {
-	    details_data = data
-	}
-	OverviewLoad(details_data, graph_overview_perf);
-	DetailsLoad(details_data);
+	var data = fetch_data(objects);
+	// if ( data.length > 0 ) {
+	//     details_data = data
+	// }
+	// OverviewLoad(details_data, graph_overview_perf);
+	// DetailsLoad(details_data);
     }, 1000);
 });
 
@@ -327,10 +358,10 @@ function validateInput(el) {
     console.log(el, name, value, rval);
     return rval;
 };
-function fetch_data(details_data) {
-    var data = [];
+function fetch_data(objects) {
+    // var data = [];
     $.ajax({
-	async: false,
+	// async: false,
 	type: "GET",
 	url: "{{ url_for('api_capacity') }}",
 	success: function (e) {
@@ -340,54 +371,57 @@ function fetch_data(details_data) {
 		if ( sw ) {
 		    sw = JSON.parse(sw);
 		    if ( sw.apps && sw.apps.kvm ) {
-			data.push({
+			objects['data'].push({
 			    "name": raw[r].host,
 			    "kvm": sw.apps.kvm
 			})
 		    }
-		}		
+		}
+		OverviewLoad(objects);
+		DetailsLoad(objects);
 	    }
 	}
     })
-    return data
 }
-function OverviewLoad(dataset, graph_overview_perf) {
-    var hosts = dataset.length;
+function OverviewLoad(objects) {
+    var graph_overview_perf = objects['graph_perf'];
+    
+    var hosts = objects['data'].length;
     var domains = 0;
     var cpu_perc = 0;
     var mem_perc = 0;
     var str_perc = 0;
 
-    for (hv in dataset) {
+    for (hv in objects['data']) {
 	var storage_total = 0;
 	var storage_avail = 0;
 	var memory_total  = 0;
 	var memory_avail  = 0;
 	var cpu_total     = 0;
 	var cpu_avail     = 0;
-	for (pool in dataset[hv]['kvm']['pools']) {
-	    storage_total+=Number(dataset[hv]['kvm']['pools'][pool]['capacity']);
-	    storage_avail+=Number(dataset[hv]['kvm']['pools'][pool]['available']);
+	for (pool in objects['data'][hv]['kvm']['pools']) {
+	    storage_total+=Number(objects['data'][hv]['kvm']['pools'][pool]['capacity']);
+	    storage_avail+=Number(objects['data'][hv]['kvm']['pools'][pool]['available']);
 	}
 
 	var mem_usage = 0;
 	var cpu_usage = 0;
-	for (dom in dataset[hv]['kvm']['domains']) {
-	    mem_usage+=Number(dataset[hv]['kvm']['domains'][dom]['memory']);
-	    cpu_usage+=Number(dataset[hv]['kvm']['domains'][dom]['vcpu']);
+	for (dom in objects['data'][hv]['kvm']['domains']) {
+	    mem_usage+=Number(objects['data'][hv]['kvm']['domains'][dom]['memory']);
+	    cpu_usage+=Number(objects['data'][hv]['kvm']['domains'][dom]['vcpu']);
 	}
 
-	domains+=dataset[hv]['kvm']['domains'].length;
+	domains+=objects['data'][hv]['kvm']['domains'].length;
 	str_perc+=( (storage_avail * 100) / storage_total);
-	mem_perc+=( (mem_usage * 100) / Number(dataset[hv]['kvm']['node']['memory_size']) )
-	cpu_perc+=( (cpu_usage * 100) / Number(dataset[hv]['kvm']['node']['cpu_count']) )
+	mem_perc+=( (mem_usage * 100) / Number(objects['data'][hv]['kvm']['node']['memory_size']) )
+	cpu_perc+=( (cpu_usage * 100) / Number(objects['data'][hv]['kvm']['node']['cpu_count']) )
     }
     
     str_perc = (str_perc / hosts)
     mem_perc = (mem_perc / hosts)
     cpu_perc = (cpu_perc / hosts)
     
-    graph_overview_perf.load({
+    objects['graph_perf'].load({
 	columns: [
 	    ['cpu',     cpu_perc.toFixed(2)],
 	    ['memory',  mem_perc.toFixed(2)],
@@ -397,34 +431,34 @@ function OverviewLoad(dataset, graph_overview_perf) {
     $('#overview-hosts-count h3').html(hosts);
     $('#overview-vms-count h3').html(domains);
 }
-function DetailsLoad(dataset) {
+function DetailsLoad(objects) {
     var html = '';
-    for (data in dataset) {
+    for (data in objects['data']) {
 	var storage_size_total = 0;
 	var storage_size_avail = 0;
-	for (pool in dataset[data]['kvm']['pools']) {
-	    storage_size_total+=Number(dataset[data]['kvm']['pools'][pool]['capacity']);
-	    storage_size_avail+=Number(dataset[data]['kvm']['pools'][pool]['available']);
+	for (pool in objects['data'][data]['kvm']['pools']) {
+	    storage_size_total+=Number(objects['data'][data]['kvm']['pools'][pool]['capacity']);
+	    storage_size_avail+=Number(objects['data'][data]['kvm']['pools'][pool]['available']);
 	}
 	html+='<table class="table table-striped table-sm table-bordered table-hover">';
 	html+=' <thead style="background: #ededed;">';
 	html+='  <tr>';
 	html+='   <th colspan="4" class="bg-default" style="text-align: center;">';
-	html+=     dataset[data]['name'];
+	html+=     objects['data'][data]['name'];
 	html+='    <br>';
 	html+='    <span>';
 	html+='     <i class="fa fa-fw fa-microchip"></i> ';
-	html+=      dataset[data]['kvm']['node']['cpu_count'];
+	html+=      objects['data'][data]['kvm']['node']['cpu_count'];
 	html+='    </span>';
 	html+='    <i class="fa fa-fw fa-ellipsis-v"></i>';
 	html+='    <span>';
 	html+='     <i class="fa fa-fw fa-memory"></i> ';
-	html+=      humanSize(dataset[data]['kvm']['node']['memory_size']);
+	html+=      humanSize(objects['data'][data]['kvm']['node']['memory_size']);
 	html+='    </span>';
 	html+='    <i class="fa fa-fw fa-ellipsis-v"></i>';
 	html+='    <span>';
 	html+='     <i class="fa fa-fw fa-database"></i> ';
-	html+=      humanSize(storage_size_total) + ' (' + dataset[data]['kvm']['pools'].length + ')'; 
+	html+=      humanSize(storage_size_total) + ' (' + objects['data'][data]['kvm']['pools'].length + ')'; 
 	html+='    </span>';
 	// html+='    <i class="fa fa-fw fa-ellipsis-v"></i>';
 	// html+='    <span>';
@@ -458,24 +492,24 @@ function DetailsLoad(dataset) {
 	html+='</thead>';
 	html+='<tbody>'
 	subtotal = { "domains": 0, "vcpu": 0, "memory": 0, "storage": 0 }
-	for (dom in dataset[data]['kvm']['domains']) {
+	for (dom in objects['data'][data]['kvm']['domains']) {
 	    html+='<tr>';
 	    html+=' <th scope="row">';
 	    html+='  <span>';
-	    if (dataset[data]['kvm']['domains'][dom]['status'] == 'running') {
+	    if (objects['data'][data]['kvm']['domains'][dom]['status'] == 'running') {
 		html+='<i class="fa fa-fw fa-check-circle status-green"></i> ';
 	    } else {
 		html+='<i class="fa fa-fw fa-exclamation-triangle status-red"></i> ';
 	    }
-	    html+=    dataset[data]['kvm']['domains'][dom]['name'];
+	    html+=    objects['data'][data]['kvm']['domains'][dom]['name'];
 	    html+='  </span>';
 	    html+='  <span class="vm-opts pull-right">'
-	    if (dataset[data]['kvm']['domains'][dom]['autostart'] == 'enable') {
+	    if (objects['data'][data]['kvm']['domains'][dom]['autostart'] == 'enable') {
 		html+='<i class="fa fa-fw fa-stopwatch status-green" title="Autostart=yes"></i>';
 	    } else {
 		html+='<i class="fa fa-fw fa-stopwatch status-red" title="Autostart=no"></i>';
 	    }
-	    if (dataset[data]['kvm']['domains'][dom]['persistent'] == 'yes') {
+	    if (objects['data'][data]['kvm']['domains'][dom]['persistent'] == 'yes') {
 		html+='<i class="fa fa-fw fa-anchor status-green" title="Persistent=yes"></i>';
 	    } else {
 		html+='<i class="fa fa-fw fa-anchor status-red" title="Persistent=no"></i>';
@@ -484,24 +518,24 @@ function DetailsLoad(dataset) {
 	    html+=' </th>';
 	    html+=' <th scope="row">';
 	    html+='  <span class="pull-right">';
-	    html+=    dataset[data]['kvm']['domains'][dom]['vcpu'];
+	    html+=    objects['data'][data]['kvm']['domains'][dom]['vcpu'];
 	    html+='  </span>';
 	    html+=' </th>';
 	    html+=' <th scope="row">';
 	    html+='  <span class="pull-right">';
-	    html+=    humanSize(dataset[data]['kvm']['domains'][dom]['memory']);
+	    html+=    humanSize(objects['data'][data]['kvm']['domains'][dom]['memory']);
 	    html+='  </span></th>';
 	    html+=' <th scope="row">';
 	    html+='  <span class="pull-right">';
-	    html+=    humanSize(dataset[data]['kvm']['domains'][dom]['storage_capacity']);
+	    html+=    humanSize(objects['data'][data]['kvm']['domains'][dom]['storage_capacity']);
 	    html+='  </span>';
 	    html+=' </th>';
 	    html+='</tr>';
 
-	    subtotal['domains'] += 1;
-	    subtotal['vcpu']    += Number(dataset[data]['kvm']['domains'][dom]['vcpu']);
-	    subtotal['memory']  += Number(dataset[data]['kvm']['domains'][dom]['memory']);
-	    subtotal['storage'] += Number(dataset[data]['kvm']['domains'][dom]['storage_alloc']);
+	    subtotal['domains']+= 1;
+	    subtotal['vcpu']   += Number(objects['data'][data]['kvm']['domains'][dom]['vcpu']);
+	    subtotal['memory'] += Number(objects['data'][data]['kvm']['domains'][dom]['memory']);
+	    subtotal['storage']+= Number(objects['data'][data]['kvm']['domains'][dom]['storage_alloc']);
 	}
 	
 	html+='</tbody>';
@@ -528,12 +562,12 @@ function DetailsLoad(dataset) {
 	html+='  <th scope="col">Available</th>';
 	html+='  <th scope="col">';
 	html+='   <span class="pull-right">'
-	html+=     dataset[data]['kvm']['node']['cpu_count'] - subtotal['vcpu']
+	html+=     objects['data'][data]['kvm']['node']['cpu_count'] - subtotal['vcpu']
 	html+='   </span>';
 	html+='  </th>';
 	html+='  <th scope="col">';
 	html+='   <span class="pull-right">'
-	html+=     humanSize(dataset[data]['kvm']['node']['memory_size'] - subtotal['memory']);
+	html+=     humanSize(objects['data'][data]['kvm']['node']['memory_size'] - subtotal['memory']);
 	html+='   </span>';
 	html+='  </th>';
 	html+='  <th scope="col">';
@@ -545,7 +579,7 @@ function DetailsLoad(dataset) {
 	html+='</tfoot>'
 	html+='<caption align="bottom">';
 	html+=  subtotal['domains'] + ' domains';
-	if ( subtotal['vcpu'] > dataset[data]['kvm']['node']['cpu_count'] ) {
+	if ( subtotal['vcpu'] > objects['data'][data]['kvm']['node']['cpu_count'] ) {
 	    html+=' with CPU overcommit.'
 	}
 	html+='</caption>'
@@ -591,6 +625,34 @@ function humanSize(bytes, si=false) {
 	++u;
     } while(Math.abs(bytes) >= thresh && u < units.length - 1);
     return bytes.toFixed(1)+' '+units[u];
+}
+function Size2Bytes(size, units="KiB") {
+    if ( /^(B|bytes|Bytes)$/.test(units) ) {
+	return size;
+    }
+    if ( /^.*iB$/.test(units) ) {
+	var table = [ 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB' ];
+	var multi = 1024;
+    } else {
+	var table = [ 'kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
+	var multi = 1000;
+    }
+    // if (size < multi) {
+	// var index = 0;
+    for (u in table) {
+	console.log(units, table[u])
+	    if ( units == table[u] ) {
+		break;
+	    }
+	    size=size*multi
+	    // index++;
+	}
+	// while (( index >= 0 )) {
+	//     size=size*multi
+	//     index--;
+	// }
+    // }
+    return size
 }
 </script>
 {% endblock %}

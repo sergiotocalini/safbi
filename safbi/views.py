@@ -50,6 +50,7 @@ def active_user(f):
 
 def admin_required(f):
     @wraps(f)
+    @active_user
     @db_session    
     def decorated_func(*args, **kwargs):
         if not session['user'].get('admin'):
@@ -164,15 +165,27 @@ def unauthorized():
     else:
         return redirect(url_for('index'))
 
-@app.route('/capacity')
-@active_user
-def capacity():
-    return render_template('capacity.html')
+@app.route('/admin', defaults={'section': 'general'})
+@app.route('/admin/<section>')
+@admin_required
+def admin(section):
+    if section == 'users':
+        return render_template('admin/users.html')
+    else:
+        return render_template('admin/index.html')
 
-@app.route('/inventory')
+@app.route('/monitoring', defaults={'section': 'general'})
+@app.route('/monitoring/<section>')
 @active_user
-def inventory():
-    return render_template('inventory.html')
+def monitoring(section):
+    if section == 'capacity':
+        return render_template('monitoring/capacity.html')
+    elif section == 'inventory':
+        return render_template('monitoring/inventory.html')
+    elif section == 'events':
+        return render_template('monitoring/events.html')
+    else:
+        return render_template('monitoring/index.html')
 
 @app.route('/api/capacity')
 @active_user
@@ -201,6 +214,141 @@ def api_inventory():
                        selectInventory=['hardware_full', 'software_full', 'name'],
                        filter={'available': [1, 2]})
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
+
+@app.route('/api/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@db_session
+def api_configs():
+    yes = ["yes", "true", "t", "1"]
+    args = request.args.to_dict()
+    qfilter = dict((x, args[x]) for x in args if x in ['id', 'key'])
+    if qfilter:
+        config = get_data('Config', **qfilter)
+        if config:
+            data = []
+            if request.method == 'PUT':
+                content = request.get_json(silent=True)
+                if content:
+                    config.set(**content)
+                    updated = True
+                if updated:
+                    commit()
+            elif request.method == 'DELETE':
+                config.delete()
+                commit()
+            else:
+                data = config.to_dict(related_objects=False)
+                return jsonify(datetime=datetime.now(), data=data)
+            return jsonify(datetime=datetime.now(), data=data)
+        else:
+            abort(404)
+    elif request.method == 'POST':
+        content = request.get_json(silent=True)
+        if content:
+            Config(**content)
+            commit()
+    else:
+        abort(400)
+    return jsonify(datetime=datetime.now(), data=[])
+
+@app.route('/api/configs/all', methods=['GET'])
+@db_session
+def api_configs_all():
+    args = request.args.to_dict()
+    args.setdefault('type', None)
+    args.setdefault('filter', None)
+    args.setdefault('sort', 'id')
+    args.setdefault('order', 'asc')
+    args.setdefault('search', None)
+    args.setdefault('status', None)
+    args.setdefault('priority', None)
+    args.setdefault('requester', None)
+    args.setdefault('offset', 0)
+    args.setdefault('limit', 50)
+    data = []
+    raw = []
+    raw = get_data('Config')
+    
+    if args['search']:
+        raw = raw.filter(lambda c: args['search'].lower() in c.key.lower())
+
+    if getattr(Customer, args['sort'], None):
+        if args['order'] == 'desc':
+            raw = raw.order_by(lambda o: desc(getattr(o, args['sort'])))
+        else:
+            raw = raw.order_by(lambda o: getattr(o, args['sort']))
+
+    for i in raw.limit(int(args['limit']), offset=int(args['offset'])):
+        row = i.to_dict(related_objects=False)
+        data.append(row)
+    return jsonify(datetime=datetime.now(), data=data, total=count(raw))
+
+@app.route('/api/users', methods=['GET', 'POST'])
+@db_session
+def api_users():
+    if request.method == 'GET':
+        args = request.args.to_dict()
+        qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
+        if qfilter:
+            user = get_data('User', **qfilter)
+            if user:
+                data = [user.to_dict(exclude="password")]
+                return jsonify(datetime=datetime.now(), data=data)
+    elif request.method == 'POST':
+        args = request.args.to_dict()
+        qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
+        if qfilter:
+            user = get_data('User', **qfilter)
+            if user:
+                content = request.get_json(silent=True)
+                user.set(**content)
+                commit()
+        else:
+            abort(400)
+    return jsonify(datetime=datetime.now())
+
+@app.route('/api/users/all', methods=['GET'])
+@db_session
+def api_users_all():
+    args = request.args.to_dict()
+    args.setdefault('type', None)
+    args.setdefault('filter', None)
+    args.setdefault('sort', 'name')
+    args.setdefault('order', 'asc')
+    args.setdefault('search', None)
+    args.setdefault('offset', 0)
+    args.setdefault('limit', 50)
+    args.setdefault('status', None)
+    only_user = ['id', 'userid', 'displayname', 'email', 'avatar',
+                 'status', 'title', 'created_on', 'last_seen']
+    only_team = ['id', 'name', 'description', 'mobile', 'avatar']
+    data = []
+    raw = get_data('User')
+        
+    if args['search']:
+        raw = raw.filter(lambda o: args['search'].lower() in o.displayname.lower())
+
+    if args['status']:
+        raw = raw.filter(lambda o: args['status'] == o.status)
+        
+    if getattr(User, args['sort'], None):
+        if args['order'] == 'desc':
+            raw = raw.order_by(lambda o: desc(getattr(o, args['sort'])))
+        else:
+            raw = raw.order_by(lambda o: getattr(o, args['sort']))
+
+    total = count(raw)
+    if args['limit'] not in ["no", "false", "f", "-1", "None"]:
+        raw = raw.limit(int(args['limit']), offset=int(args['offset']))
+        
+    for i in raw:
+        row = i.to_dict(related_objects=False)
+        # if args['filter'] != 'team' and i.team:
+        #     team = i.team.to_dict(only_team)
+        #     team['manager'] = i.team.manager.to_dict(only_user)
+        #     row['team'] = team
+        data.append(row)
+    return jsonify(datetime=datetime.now(), data=data, total=total)
+
 
 if __name__ == "__main__":
     app.run('0.0.0.0', 7007)

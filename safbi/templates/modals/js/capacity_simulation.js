@@ -5,13 +5,12 @@ function HostsScoreCalc(dataset, options) {
 	mem: 2,
 	cpu: 1,
     };
-    console.log(values, options);
     for (opt in options) {
 	if ( !(/.*_units$/.test(options[opt]['name'])) ) {
 	    values[options[opt]['name']]=Number(options[opt]['value']);
 	}
     }
-    console.log(values, options);
+    console.log(values);
     var scores = {
     	mem: 2.00, hdd: 0.50, cpu: 0.50 
     };

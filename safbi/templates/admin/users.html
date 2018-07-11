@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Administration: Users{% endblock %}
+
+{% block body %}
+<div class="admin-users-header section-header">
+  <div class="title">
+    <i class="fa fa-fw fa-users" aria-hidden="true"></i>
+    Administration: Users
+  </div>
+</div>
+<div class="admin-users-content section-content" style="padding: 0% 1%">
+  <div class="menu-information">
+    <div class="admin-users-menu list-group nav nav-tabs" data-tabs="tabs">
+      <a href="#admin-users" data-toggle="tab" class="list-group-item">
+	<i class="fa fa-fw fa-users" aria-hidden="true"></i>
+	Users
+      </a>
+    </div>
+  </div>
+  <div class="admin-tab-content tab-content" style="margin: 0.5% 0%;">
+    <div id="admin-users" class="tab-subcontent tab-pane fade in active">
+      <div id="admin-users-toolbar">
+	<button class="btn btn-primary" type="button" data-toggle="modal"
+		aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-fw fa-plus"></i>
+	</button>
+      </div>
+      <table id="table-users" data-show-toggle="false"
+             data-show-toggle="false" data-show-export="false"
+             data-show-columns="false" data-show-multi-sort="true"
+             data-sort-name="displayname" data-pagination="true"
+             data-toggle="table" data-search="true"
+             data-show-footer="false" data-page-size="50"
+             data-escape="false" data-side-pagination="server"
+	     data-query-params="UsersParams" 
+	     data-show-refresh="true" data-row-style="rowStyle"
+	     data-url="{{ url_for('api_users_all') }}?"
+	     data-response-handler="UsersResponseHandler"
+	     data-toolbar="#admin-users-toolbar"
+	     class="table table-hover table-striped table-compact 
+		    table-condensed table-autosize">
+	<thead>
+	  <tr>
+	    <th data-align="center" data-valign="middle" data-field="status"
+		data-sortable="true" data-visible="false"
+		data-checkbox="true">
+	      <i class="fa fa-fw fa-question"></i>
+	      Status
+	    </th>
+	    <th data-sortable="true" data-halign="center"
+		data-valign="middle" data-field="id"
+		data-visible="false">
+	      #
+	    </th>
+	    <th data-sortable="true" data-halign="center"
+		data-valign="middle" data-field="userid"
+		data-visible="false">
+	      Account
+	    </th>
+	    <th data-sortable="true" data-halign="center"
+		data-valign="middle" data-field="display"
+		data-formatter="UsersFormatterName">
+	      Display Name
+	    </th>
+	    <th data-halign="center" data-valign="middle" 
+		data-align="left" data-field="email">
+	      Email
+	    </th>
+	    <th data-valign="middle" data-align="center"
+		data-field="created_on" data-formatter="UsersFormatterDate">
+	      <i class="fa fa-calendar fa-fw"></i>
+	      Created on
+	    </th>
+	    <th data-valign="middle" data-align="center"
+		data-field="last_seen" data-formatter="UsersFormatterDate">
+	      <i class="fa fa-calendar fa-fw"></i>
+	      Last seen
+	    </th>
+	    <th data-valign="middle" data-align="center"
+		data-valign="middle" data-formatter="UsersFormatterActions">
+	      <i class="fa fa-cogs fa-fw"></i>
+	      Actions
+	    </th>
+	  </tr>
+	</thead>
+	<tbody>
+	</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<div id="ModalUser" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog" style="height:100%">
+      <div class="modal-content" style="height:350px;top:40%;transform:translateY(-50%);">
+	<div class="modal-header"
+	     style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">New</h4>
+	</div>
+	<div class="modal-body">
+	  <img id="avatar" class="img-circle"
+	       style="float:left; width:25%; padding:5% 0%;"/>
+	  <form class="form-horizontal" 
+		style="float:left; width:65%;padding:5% 5%;"
+		role="form" method="POST">
+	    <fieldset id="fieldset">
+	      <input class="col-md-8 form-control-static hidden" id="uid">
+	      <div class="form-group">
+		<label class="col-md-4 control-label" for="userid">
+		  User ID
+		</label>
+		<div class="col-md-8 form-control-static" id="userid"></div>
+	      </div>	      
+	      <div class="form-group">
+		<label class="col-md-4 control-label" for="email">
+		  Email
+		</label>
+		<div class="col-md-8 form-control-static" id="email"></div>
+	      </div>
+	      <div class="form-group">
+		<label class="col-md-4 control-label" for="display">
+		  Display
+		</label>
+		<div class="col-md-8 form-control-static" id="display"></div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+	<div class="modal-footer" 
+	     style="position:absolute;width:100%;bottom:0px">
+	  <div class="pull-left">
+	    <a class="user-admin"
+	       style="outline: none;text-decoration: none;cursor: pointer;">
+	      <i class="fa fa-fw fa-2x" aria-hidden="true"></i>
+	    </a>
+	    <a class="user-lock"
+	       style="outline: none;text-decoration: none;cursor: pointer;">
+	      <i class="fa fa-fw fa-2x" aria-hidden="true"></i>
+	    </a>
+	  </div>
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-default"
+		    data-dismiss="modal">
+	      Close
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link href="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.css" rel="stylesheet">
+<script src="//cdn.corpam.com.ar/bootstrap-table/stable/bootstrap-table.js"></script>
+<script>
+    $(document).ready(function () {
+	autosize_tables();
+	$(window).resize(function () {
+	    autosize_tables();
+	});
+	$('.modal').on('hidden.bs.modal', function(){
+	    $('.modal').find('.modal-title').html('New');
+	    var forms = $(this).find('form');
+	    forms.each(function(row){
+		forms[row].reset();
+	    });
+	    var selectpickers = $(this).find('.selectpicker');
+	    selectpickers.each(function(row){
+		$(selectpickers[row]).selectpicker('refresh');
+	    });
+	});
+	jqlisteners();
+    });
+{% include "js/common.js" %}
+function jqlisteners() {
+    $(".user-admin").click(function(e) {
+	e.preventDefault();
+	var tag_admin = $(this).find('i');
+	if ( ! tag_admin.hasClass("fa-spinner") ) {
+	    var uid = $("#ModalUser").find('#uid').val();
+	    if (tag_admin.hasClass("fa-user-secret")) {
+		var active = false;
+		tag_admin.removeClass("fa-user-secret");
+		tag_admin.addClass("fa-spinner fa-pulse");
+	    } else {
+		var active = true;
+		tag_admin.removeClass("fa-user");
+		tag_admin.addClass("fa-spinner fa-pulse");
+	    };
+	    $.ajax({
+		async: true,
+		url: "{{ url_for('api_users') }}?id=" + uid,
+		type: "POST",
+		data: JSON.stringify({"admin": active}),
+		contentType: "application/json",
+		success: function(e) {
+		    tag_admin.removeClass("fa-spinner fa-pulse");
+		    if (active == true) {
+			tag_admin.addClass("fa-user-secret");
+		    } else {
+			tag_admin.addClass("fa-user");
+		    };
+		}
+	    });
+	}
+    });
+    $('.user-lock').click(function(e) {
+	e.preventDefault();
+	var tag_lock = $(this).find('i');
+	if ( ! tag_lock.hasClass("fa-spinner") ) {
+	    var uid = $('#ModalUser').find('#uid').val();
+	    if (tag_lock.hasClass('fa-unlock')) {
+		var active = false;
+		tag_lock.removeClass('fa-unlock');
+		tag_lock.addClass('fa-spinner fa-pulse');
+	    } else {
+		var active = true;
+		tag_lock.removeClass('fa-lock');
+		tag_lock.addClass('fa-spinner fa-pulse');
+	    };
+	    $.ajax({
+		async: true,
+		url: "{{ url_for('api_users') }}?id=" + uid,
+		type: 'POST',
+		data: JSON.stringify({'status': active}),
+		contentType: "application/json",
+		success: function(e) {
+		    tag_lock.removeClass('fa-spinner fa-pulse');
+		    if (active == true) {
+			tag_lock.addClass('fa-unlock');
+		    } else {
+			tag_lock.addClass('fa-lock');	    
+		    };
+		}
+	    });
+	}
+    });
+    $(".user-open").click(function(e) {
+	e.preventDefault();
+	var uid = $(this).data('id');
+	var modal = "#ModalUser";
+	$.ajax({
+	    async: true,
+	    url: "{{ url_for('api_users') }}?id=" + uid,
+	    type: 'GET',
+	    success: function(e) {
+		var data = e['data'][0];
+		$(modal).find('.modal-title').html(data['displayname']);
+		$(modal).find('#avatar').attr('src', data['avatar']);
+		$(modal).find('#uid').val(data['id']);
+		$(modal).find('#userid').html(data['userid']);
+		$(modal).find('#email').html(data['email']);
+		$(modal).find('#display').html(data['displayname']);
+		var tag_lock = $(modal).find('.user-lock').find('i');
+		var tag_admin = $(modal).find('.user-admin').find('i');
+		if (data['status'] === false) {
+		    tag_lock.addClass('fa-lock');
+		} else {
+		    tag_lock.addClass('fa-unlock');
+		}
+		if (data['admin'] === false) {
+		    if ( tag_admin.hasClass('fa-user-secret')) {
+			tag_admin.removeClass('fa-user-secret');
+		    }
+		    if (! tag_admin.hasClass('fa-user')) {
+			tag_admin.addClass('fa-user');
+		    }
+		} else {
+		    if ( tag_admin.hasClass('fa-user')) {
+			tag_admin.removeClass('fa-user');
+		    }
+		    if (! tag_admin.hasClass('fa-user-secret')) {
+			tag_admin.addClass('fa-user-secret');
+		    }
+		}
+		$(modal).modal('show');		
+	    }
+	});
+    });
+}
+function UsersParams(params) {
+    return params
+}
+function UsersResponseHandler(res) {
+    var data = [];
+    for(r in res.data) {
+	var row = res.data[r];
+	var doc = {
+	    status: row.status,
+	    id: row.id,
+	    displayname: row.displayname,
+	    user_avatar: row.avatar,
+	    email: row.email,
+	    created_on: row.created_on,
+	    last_seen: row.last_seen,
+	};
+	data.push(doc);
+    };
+    return {
+	total: res.total,
+	rows: data,
+    }
+}
+function UsersFormatterName(value, row) {
+    var html = ""
+    html += '<img class="fa fa-fw img-circle" src="';
+    html += row.user_avatar + '"/> ';
+    html += row.displayname;
+    return html;
+}
+function UsersFormatterActions(value, row) {
+    var html = ""
+    html += '<a class="user-del" data-toggle="confirmation" ';
+    html += 'data-id="' + row.id + '" href="#">';
+    html += '<i class="fa fa-fw fa-trash"></i>';
+    html += '</a>';
+    html += '<a class="user-open" data-toggle="confirmation" ';
+    html += 'data-id="' + row.id + '" href="#">';
+    html += '<i class="fa fa-fw fa-search"></i>';
+    html += '</a>';
+    return html;
+}
+function UsersFormatterDate(value, row) {
+    return moment(Date.parse(value)).format("YYYY-MM-DD hh:mm");
+}
+</script>
+{% endblock %}

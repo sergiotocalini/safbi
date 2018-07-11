@@ -1027,7 +1027,15 @@ body {
 .status-red {
     color: #9b5555;
 }
-
+.status-gray {
+    color: #6c6d6c;
+}
+.status-blue {
+    color: #4367a0;
+}
+.status-yellow {
+    color: #e8d906;
+}
 @media print {
   body * {
     visibility: hidden;

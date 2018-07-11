@@ -104,16 +104,32 @@
 	    <span class="hiddeable">Monitoring</span>
 	  </a>
 	  <ul class="dropdown-menu">
+	    <li class="disabled">
+	      <a href="{{ url_for('monitoring') }}"
+		 title="Dashboard" data-toggle="tooltip">
+		<i class="fa fa-fw fa-chalkboard-teacher" aria-hidden="true"></i>
+		<span>Dashboard</span>
+	      </a>
+	    </li>
 	    <li>
-	      <a href="{{ url_for('capacity') }}" title="Capacity" data-toggle="tooltip">
+	      <a href="{{ url_for('monitoring', section='capacity') }}"
+		 title="Capacity" data-toggle="tooltip">
 		<i class="fa fa-fw fa-binoculars" aria-hidden="true"></i>
 		<span>Capacity</span>
 	      </a>
 	    </li>
 	    <li>
-	      <a href="{{ url_for('inventory') }}" title="Inventory" data-toggle="tooltip">
+	      <a href="{{ url_for('monitoring', section='inventory') }}"
+		 title="Inventory" data-toggle="tooltip">
 		<i class="fa fa-fw fa-dolly" aria-hidden="true"></i>
 		<span>Inventory</span>
+	      </a>
+	    </li>
+	    <li class="disabled">
+	      <a href="{{ url_for('monitoring', section='events') }}"
+		 title="Events" data-toggle="tooltip">
+		<i class="fa fa-fw fa-history" aria-hidden="true"></i>
+		<span>Events</span>
 	      </a>
 	    </li>
 	  </ul>
@@ -127,39 +143,27 @@
 	  </a>
 	  <ul class="dropdown-menu">
 	    <li>
-	      <a href="{{ url_for('index', mod='users') }}">
+	      <a href="{{ url_for('admin', section='users') }}">
 		<i class="fa fa-fw fa-users" aria-hidden="true"></i>
 		<span>Users</span>
 	      </a>
 	    </li>
-	    <li>
-	      <a href="{{ url_for('index', mod='modules') }}">
-		<i class="fa fa-fw fa-cogs" aria-hidden="true"></i>
-		<span>Modules</span>
-	      </a>
-	    </li>
-	    <li>
-    	      <a href="{{ url_for('index', mod='settings') }}">
-    		<i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
-    		<span>Settings</span>
-    	      </a>
-	    </li>
-	    <li>
-    	      <a href="{{ url_for('index', mod='authentication') }}">
-    		<i class="fa fa-fw fa-database" aria-hidden="true"></i>
-    		<span>Authentication</span>
-    	      </a>
-	    </li>
-	    <li>
-    	      <a href="{{ url_for('index', mod='plugins') }}">
-    		<i class="fa fa-fw fa-plug" aria-hidden="true"></i>
-    		<span>Plugins</span>
+	    <li class="disabled">
+    	      <a href="{{ url_for('admin', section='auth') }}">
+    	    	<i class="fa fa-fw fa-database" aria-hidden="true"></i>
+    	    	<span>Authentication</span>
     	      </a>
 	    </li>
 	    <li class="disabled">
-    	      <a href="{{ url_for('index', mod='information') }}">
-    		<i class="fa fa-fw fa-info" aria-hidden="true"></i>
-    		<span>Information</span>
+    	      <a href="{{ url_for('admin', section='plugins') }}">
+    	    	<i class="fa fa-fw fa-plug" aria-hidden="true"></i>
+    	    	<span>Plugins</span>
+    	      </a>
+	    </li>
+	    <li class="disabled">
+    	      <a href="{{ url_for('admin', section='info') }}">
+    	    	<i class="fa fa-fw fa-info" aria-hidden="true"></i>
+    	    	<span>Information</span>
     	      </a>
 	    </li>
 	  </ul>
