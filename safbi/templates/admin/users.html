@@ -35,7 +35,7 @@
              data-escape="false" data-side-pagination="server"
 	     data-query-params="UsersParams" 
 	     data-show-refresh="true" data-row-style="rowStyle"
-	     data-url="{{ url_for('api_users_all') }}?"
+	     data-url="{{ url_for('api_admin_users_all') }}?"
 	     data-response-handler="UsersResponseHandler"
 	     data-toolbar="#admin-users-toolbar"
 	     class="table table-hover table-striped table-compact 
@@ -199,7 +199,7 @@ function jqlisteners() {
 	    };
 	    $.ajax({
 		async: true,
-		url: "{{ url_for('api_users') }}?id=" + uid,
+		url: "{{ url_for('api_admin_users') }}?id=" + uid,
 		type: "POST",
 		data: JSON.stringify({"admin": active}),
 		contentType: "application/json",
@@ -230,7 +230,7 @@ function jqlisteners() {
 	    };
 	    $.ajax({
 		async: true,
-		url: "{{ url_for('api_users') }}?id=" + uid,
+		url: "{{ url_for('api_admin_users') }}?id=" + uid,
 		type: 'POST',
 		data: JSON.stringify({'status': active}),
 		contentType: "application/json",
@@ -251,7 +251,7 @@ function jqlisteners() {
 	var modal = "#ModalUser";
 	$.ajax({
 	    async: true,
-	    url: "{{ url_for('api_users') }}?id=" + uid,
+	    url: "{{ url_for('api_admin_users') }}?id=" + uid,
 	    type: 'GET',
 	    success: function(e) {
 		var data = e['data'][0];
