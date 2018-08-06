@@ -8,5 +8,36 @@
     <i class="fa fa-fw fa-chalkboard-teacher" aria-hidden="true"></i>
     Monitoring: Dashboard
   </div>
+  <div class="section-toolbar toolbar pull-right">
+    <a data-init="true" href="#filter" data-click="section-filter"
+       aria-disabled="true" title="Filter">
+      <i class="fa fa-2x fa-filter"></i>
+      <span id="section-toolbar-filter-badge" class="badge badge-primary"></span>
+    </a>
+  </div>    
 </div>
+{% endblock %}
+
+
+{% block modals %}
+{% include "monitoring/modals/capacity_filter.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function () {
+    $(document).on("click", "[data-click=section-filter]", function(a) {
+	a.preventDefault();
+	var modal = '#modal-monitoring-capacity-filter';
+	$(modal).find('.modal-title').html('<i class="fa fa-fw fa-filter"></i> Filters');
+	$(modal).modal('toggle');
+    });
+    setTimeout(function () {
+	console.log(setURLParam('enable', 'key'));
+    }, 10000);
+});
+
+{% include "js/common.js" %}
+
+</script>
 {% endblock %}

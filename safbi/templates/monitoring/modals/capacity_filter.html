@@ -1,0 +1,74 @@
+<div id="modal-monitoring-capacity-filter" class="modal fade" tabindex="-1"
+     role="dialog" aria-labelledby="Monitoring Capacity - Filter" aria-hidden="true">
+  <div class="modal-vcenter">
+    <div class="modal-dialog" style="width:40%">
+      <div class="modal-content">
+	<div class="modal-header" style="background-color: #337ab7; color: #fff;">
+	  <button type="button" class="close"
+		  data-dismiss="modal" aria-hidden="true">
+	    &times;
+	  </button>
+	  <h4 class="modal-title">Filters</h4>
+	</div>
+	<div class="modal-body" style="min-height:450px;max-height:700px">
+	  <div id="filter-toolbar" class="toolbar"
+	       style="max-height:10%;padding:0.5% 0%;">
+	    <button class="btn btn-primary" type="button" id="filter-add" style="outline:none">
+	      <i class="fa fa-fw fa-plus"></i>
+	      Add
+	    </button>
+	  </div>
+	  <table id="filter-table"
+		 data-toggle="table" data-escape="false" data-toolbar="#filter-toolbar"
+		 class="table-hover table-striped table-compact table-condensed
+			table-autosize">
+	    <thead>
+	      <tr>
+		<th data-field="state" data-align="center" data-valign="middle"
+		    data-checkbox="true" data-visible="false">
+		</th>
+		<th data-field="delete" data-align="left" data-valign="middle"
+		    data-visible="false">
+		  Delete
+		</th>
+		<th data-field="key" data-align="left" data-valign="middle"
+		    data-width="20%"
+		    data-formatter="CapacityFilterFormatterKey">
+		  <i class="fa fa-fw fa-table"></i>
+		  Key
+		</th>
+		<th data-field="value" data-align="left" data-valign="middle"
+		    data-formatter="CapacityFilterFormatterValue">
+		  <i class="fa fa-fw fa-table"></i>
+		  Value
+		</th>
+		<th data-field="actions" data-align="center" data-valign="middle"
+		    data-width="10%"
+		    data-formatter="CapacityFilterFormatterActions">
+		  <i class="fa fa-fw fa-user-cog"></i>
+		</th>
+	      </tr>
+	    </thead>
+	    <tbody>
+	    </tbody>
+	  </table>
+	</div>
+	<div class="modal-footer">
+	  <div class="pull-left">
+	    <button type="button" class="btn btn-danger" id="filter-reset" style="outline:none">
+	      Reset
+	    </button>
+	  </div>
+	  <div class="pull-right">
+	    <button type="button" class="btn btn-primary" id="filter-apply" style="outline:none">
+	      Apply
+	    </button>
+	    <button type="button" class="btn btn-default" data-dismiss="modal">
+	      Close
+	    </button>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+</div>

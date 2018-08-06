@@ -187,10 +187,10 @@ def monitoring(section):
     else:
         return render_template('monitoring/index.html')
 
-@app.route('/api/capacity')
+@app.route('/api/monitoring/capacity')
 @active_user
 @db_session
-def api_capacity():
+def api_monitoring_capacity():
     args = request.args.to_dict()
     data = []
     raw = []
@@ -201,10 +201,10 @@ def api_capacity():
                        filter={'available': [1, 2]}, groupids=[16])
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
-@app.route('/api/inventory')
+@app.route('/api/monitoring/inventory')
 @active_user
 @db_session
-def api_inventory():
+def api_monitoring_inventory():
     args = request.args.to_dict()
     data = []
     raw = []
@@ -215,9 +215,9 @@ def api_inventory():
                        filter={'available': [1, 2]})
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
-@app.route('/api/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@app.route('/api/admin/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @db_session
-def api_configs():
+def api_admin_configs():
     yes = ["yes", "true", "t", "1"]
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'key'])
@@ -250,9 +250,9 @@ def api_configs():
         abort(400)
     return jsonify(datetime=datetime.now(), data=[])
 
-@app.route('/api/configs/all', methods=['GET'])
+@app.route('/api/admin/configs/all', methods=['GET'])
 @db_session
-def api_configs_all():
+def api_admin_configs_all():
     args = request.args.to_dict()
     args.setdefault('type', None)
     args.setdefault('filter', None)
@@ -282,9 +282,9 @@ def api_configs_all():
         data.append(row)
     return jsonify(datetime=datetime.now(), data=data, total=count(raw))
 
-@app.route('/api/users', methods=['GET', 'POST'])
+@app.route('/api/admin/users', methods=['GET', 'POST'])
 @db_session
-def api_users():
+def api_admin_users():
     if request.method == 'GET':
         args = request.args.to_dict()
         qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
@@ -306,9 +306,9 @@ def api_users():
             abort(400)
     return jsonify(datetime=datetime.now())
 
-@app.route('/api/users/all', methods=['GET'])
+@app.route('/api/admin/users/all', methods=['GET'])
 @db_session
-def api_users_all():
+def api_admin_users_all():
     args = request.args.to_dict()
     args.setdefault('type', None)
     args.setdefault('filter', None)

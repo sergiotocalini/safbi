@@ -41,10 +41,27 @@
     color: white !important;
     font-weight: normal;
 }
+.modal-dialog:not(.wizard-dialog) {
+    position: absolute !important;
+    top: 35% !important;
+    left: 50% !important;
+    transform: translateY(-50%) translateX(-50%) !important;
+    width: 50%;
+    height: auto;
+}
+.modal-body {
+    overflow-y: auto;
+    /* min-height: 65%; */
+}
 .modal-content {
-    width:inherit;
-    height:inherit;
     margin: 0 auto;
+    width: 100%;
+    /* height: 100%; */
+}
+.modal-content .modal-footer {
+    /* position: absolute; */
+    /* bottom: 0%; */
+    /* width: 100%; */
 }
 a.not-active {
     pointer-events: none;
@@ -557,14 +574,20 @@ body {
 }
 .wrapper .section-header .section-toolbar a {
     text-decoration: none;
-    padding: 5px;
-    height: 95%;
+    padding: 0px 5px;
+    height: 100%;
     color: #dedede;
 }
 .wrapper .section-header .section-toolbar a:active,
 .wrapper .section-header .section-toolbar a:hover {
     transform: scale(1.25);
     color: #337ab7;
+}
+.wrapper .section-header .section-toolbar a i {
+    padding: 5% 0%;
+}
+.wrapper .section-header .section-toolbar a span.badge {
+    background-color: #17a2b8;
 }
 .wrapper .section-header .status,
 .wrapper .project-header .progress {
@@ -956,6 +979,10 @@ body {
 /*     white-space: nowrap; */
 /*     display: block; */
 /* } */
+
+table tbody tr td.bs-checkbox {
+    vertical-align: middle;
+}
 .table-detail-row {
     padding:1% 0%;
     margin: 0%;
@@ -1020,7 +1047,6 @@ body {
 .invoice-box table tr.item.last td{
     border-bottom:none;
 }
-
 .status-green {
     color: #619b55;
 }
