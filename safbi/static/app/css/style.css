@@ -1073,3 +1073,14 @@ table tbody tr td.bs-checkbox {
     position: absolute;
   }
 }
+
+.fullscreen {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    top: 0px;
+    left: 0px;
+    z-index: 1000;
+    overflow: auto;  
+    transition: 1s opacity;
+}

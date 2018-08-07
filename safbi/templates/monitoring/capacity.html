@@ -25,14 +25,14 @@
       <i class="fa fa-2x fa-filter"></i>
       <span id="section-toolbar-filter-badge" class="badge badge-primary"></span>
     </a>
-    <a data-init="true" href="#fullscreen" data-click="section-fullscreen"
-       class="disabled" aria-disabled="true" title="Fullscreen">
-      <i class="fa fa-2x fa-expand-arrows-alt"></i>
-    </a>
     <a data-init="true" href="#simulation" data-click="section-simulation"
        aria-disabled="true" title="Simulation">
       <i class="fa fa-2x fa-crosshairs"></i>
     </a>
+    <a data-init="true" href="#fullscreen" data-click="section-fullscreen"
+       aria-disabled="true" title="Fullscreen">
+      <i class="fa fa-2x fa-expand-arrows-alt"></i>
+    </a>    
   </div>
 </div>
 <div class="capacity-content section-content" style="background: #f1f2f7;">
@@ -337,6 +337,14 @@ $(document).ready(function () {
 
     wizard.el.find(".wizard-success .create-another-server").click(function() {
 	wizard.reset();
+    });
+
+    $(document).on("click", "[data-click=section-fullscreen]", function(a) {
+	a.preventDefault();
+	$('.wrapper').toggleClass('fullscreen');
+	$('.header-bar').toggleClass('hidden');
+	$('.sidebar').toggleClass('hidden');
+	$('.footer-bar').toggleClass('hidden');
     });
     
     $(document).on("click", "[data-click=section-refresh]", function(a) {
