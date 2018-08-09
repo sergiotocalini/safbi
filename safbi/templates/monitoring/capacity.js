@@ -16,8 +16,12 @@ function fetch_data(objects) {
     objects['data'] = [];
 
     var filter_count = 0;
+
+    var filter_regex = new RegExp('(site|domain|host)');
     for (field in objects['options']) {
-	filter_count+=Number(objects['options'][field].length);
+	if ( filter_regex.test(field) ) {
+	    filter_count+=Number(objects['options'][field].length);
+	}
     }
 
     if ( filter_count > 0 ) {

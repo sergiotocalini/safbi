@@ -361,12 +361,16 @@ $(document).ready(function () {
 
 	objects['options'] = getURLParam();
 	$('#filter-table').bootstrapTable('removeAll');
+
+	var filter_regex = new RegExp('(site|domain|host)');
 	for (key in objects['options']) {
-	    for (value in objects['options'][key]) {
-		$('#filter-table').bootstrapTable('append', [{
-		    key: key,
-		    value: objects['options'][key][value]
-		}]);
+	    if ( filter_regex.test(key) ) {
+		for (value in objects['options'][key]) {
+		    $('#filter-table').bootstrapTable('append', [{
+			key: key,
+			value: objects['options'][key][value]
+		    }]);
+		}
 	    }
 	}
 	$(modal).modal('toggle');
