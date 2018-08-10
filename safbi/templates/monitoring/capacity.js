@@ -73,7 +73,7 @@ function fetch_data(objects) {
     });
 };
 function filter_host(host, opts) {
-    if ( !(host.sw.apps || host.sw.apps.kvm) ) { return false }
+    if ( !('apps' in host.sw || 'kvm' in host.sw.apps) ) { return false }
 
     var keys = ['host', 'site']
     var options = Object.keys(opts)
