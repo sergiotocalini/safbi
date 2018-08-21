@@ -96,14 +96,13 @@ function Size2Bytes(size, units="KiB") {
 };
 function setURLParam(values=[], clean=[]) {
     var kvp = document.location.search.substr(1).split('&');
-    if (clean.length > 0) {
-	var k=kvp.length; while (k--) {
-	    x = kvp[k].split('=');
-	    if (kvp[k] == '' || ifArray(clean, x[0]) ) {
-		kvp.splice(k, 1)
-	    }
+    var k=kvp.length; while (k--) {
+	x = kvp[k].split('=');
+	if (kvp[k] == '' || ifArray(clean, x[0]) ) {
+	    kvp.splice(k, 1)
 	}
     }
+
     for (v in values) {
 	kvp.push([values[v]['key'], values[v]['value']].join('='));
     }
