@@ -20,7 +20,7 @@
          data-show-toggle="false" data-show-export="false"
          data-show-columns="true" data-show-multi-sort="true"
          data-sort-name="id" data-pagination="true" data-only-info-pagination="true"
-         data-toggle="table" data-search="true"
+         data-toggle="table" data-search="true" data-striped="true"
          data-show-footer="false" data-page-size="50"
          data-escape="false" data-side-pagination="server"
 	 data-query-params="InventoryParams"
@@ -291,6 +291,22 @@ function InventoryFormatterSoftware(value, row) {
 			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/springboot.png',
     			   data: row.sw.apps.springboot.length,
     			   tooltip: 'Applications: ' + row.sw.apps.springboot.length
+    			 })
+    	}
+    	if ( row.sw.apps.gunicorn ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/gunicorn.png',
+    			   data: row.sw.apps.gunicorn.length,
+    			   tooltip: 'Applications: ' + row.sw.apps.gunicorn.length
+    			 })
+    	}
+    	if ( row.sw.apps.dovecot ) {
+    	    content.push({ type: 'img',
+			   class: 'fa fa-fw img-circle',
+			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/dovecot.png',
+    			   data: row.sw.apps.dovecot.users,
+    			   tooltip: row.sw.apps.dovecot.version
     			 })
     	}
     	if ( row.sw.apps.mysql ) {

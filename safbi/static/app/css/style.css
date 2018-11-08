@@ -584,7 +584,7 @@ body {
     color: #337ab7;
 }
 .wrapper .section-header .section-toolbar a i {
-    padding: 5% 0%;
+    padding: 2.5% 0%;
 }
 .wrapper .section-header .section-toolbar a span.badge {
     background-color: #17a2b8;
@@ -918,6 +918,7 @@ body {
     overflow: hidden;
     white-space: nowrap;
     display: block;
+    margin: auto;
 }
 .wrapper #unauth .info .account .profile .logout {
     background-color: #f8f8f8;
