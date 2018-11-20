@@ -2,11 +2,11 @@
 import os
 #import arrow
 import urllib
-from datetime import datetime, date, timedelta
+from datetime import datetime
 #from dateutil.relativedelta import relativedelta
 from functools import wraps
-from flask import Flask, request, render_template, g, jsonify, json
-from flask import url_for, abort, flash, redirect, session
+from flask import Flask, request, render_template, jsonify
+from flask import url_for, abort, redirect, session
 from lib import *
 #from mavapa import mavapa, get_user_data
 from pyzabbix import ZabbixAPI
@@ -25,7 +25,6 @@ if app.config['DB_TYPE'] == 'mysql':
             user=app.config['DB_USER'], passwd=app.config['DB_PASS'])
     db.generate_mapping(create_tables=True)
 else:
-    print('Database doesn\'t tested')
     exit(0)
 sql_debug(app.config.get('DB_DEBUG', False))
 
@@ -51,14 +50,14 @@ def active_user(f):
 def admin_required(f):
     @wraps(f)
     @active_user
-    @db_session    
+    @db_session(retry=3)
     def decorated_func(*args, **kwargs):
         if not session['user'].get('admin'):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_func
 
-@db_session
+@db_session(retry=3)
 def post_login():
     user = get_data('User', userid=session['user']['id'])
     if not user:
@@ -80,7 +79,7 @@ def fresh_user():
     return redirect(url_for('index'))
 
 @app.before_request
-@db_session
+@db_session(retry=3)
 def before_request():
     refresh_user = False
     if 'access_token' not in session:
@@ -108,7 +107,7 @@ def before_request():
         else:
             logout()
 
-@db_session
+@db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
         return eval(table).get(**kwargs)
@@ -189,34 +188,38 @@ def monitoring(section):
 
 @app.route('/api/monitoring/capacity')
 @active_user
-@db_session
+@db_session(retry=3)
 def api_monitoring_capacity():
     args = request.args.to_dict()
     data = []
     raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
-    data=zapi.host.get(output=['host', 'status', 'available'], sortfield=['host'],
-                       selectInventory=['hardware_full', 'software_full', 'name'],
-                       filter={'available': [1, 2]}, groupids=[16])
+    data = zapi.host.get(
+        output=['host', 'status', 'available'], sortfield=['host'],
+        selectInventory=['hardware_full', 'software_full', 'name'],
+        filter={'available': [1, 2]}, groupids=[16]
+    )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
 @app.route('/api/monitoring/inventory')
 @active_user
-@db_session
+@db_session(retry=3)
 def api_monitoring_inventory():
     args = request.args.to_dict()
     data = []
     raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
-    data=zapi.host.get(output=['host', 'status', 'available'], sortfield=['host'],
-                       selectInventory=['hardware_full', 'software_full', 'name'],
-                       filter={'available': [1, 2]})
+    data = zapi.host.get(
+        output=['host', 'status', 'available'], sortfield=['host'],
+        selectInventory=['hardware_full', 'software_full', 'name'],
+        filter={'available': [1, 2]}
+    )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
 @app.route('/api/admin/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
-@db_session
+@db_session(retry=3)
 def api_admin_configs():
     yes = ["yes", "true", "t", "1"]
     args = request.args.to_dict()
@@ -251,7 +254,7 @@ def api_admin_configs():
     return jsonify(datetime=datetime.now(), data=[])
 
 @app.route('/api/admin/configs/all', methods=['GET'])
-@db_session
+@db_session(retry=3)
 def api_admin_configs_all():
     args = request.args.to_dict()
     args.setdefault('type', None)
@@ -267,7 +270,6 @@ def api_admin_configs_all():
     data = []
     raw = []
     raw = get_data('Config')
-    
     if args['search']:
         raw = raw.filter(lambda c: args['search'].lower() in c.key.lower())
 
@@ -283,7 +285,7 @@ def api_admin_configs_all():
     return jsonify(datetime=datetime.now(), data=data, total=count(raw))
 
 @app.route('/api/admin/users', methods=['GET', 'POST'])
-@db_session
+@db_session(retry=3)
 def api_admin_users():
     if request.method == 'GET':
         args = request.args.to_dict()
@@ -307,7 +309,7 @@ def api_admin_users():
     return jsonify(datetime=datetime.now())
 
 @app.route('/api/admin/users/all', methods=['GET'])
-@db_session
+@db_session(retry=3)
 def api_admin_users_all():
     args = request.args.to_dict()
     args.setdefault('type', None)
@@ -323,13 +325,12 @@ def api_admin_users_all():
     only_team = ['id', 'name', 'description', 'mobile', 'avatar']
     data = []
     raw = get_data('User')
-        
     if args['search']:
         raw = raw.filter(lambda o: args['search'].lower() in o.displayname.lower())
 
     if args['status']:
         raw = raw.filter(lambda o: args['status'] == o.status)
-        
+
     if getattr(User, args['sort'], None):
         if args['order'] == 'desc':
             raw = raw.order_by(lambda o: desc(getattr(o, args['sort'])))
@@ -339,7 +340,7 @@ def api_admin_users_all():
     total = count(raw)
     if args['limit'] not in ["no", "false", "f", "-1", "None"]:
         raw = raw.limit(int(args['limit']), offset=int(args['offset']))
-        
+
     for i in raw:
         row = i.to_dict(related_objects=False)
         # if args['filter'] != 'team' and i.team:
