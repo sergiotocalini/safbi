@@ -214,7 +214,7 @@ def api_monitoring_inventory():
     data = zapi.host.get(
         output=['host', 'status', 'available'], sortfield=['host'],
         selectInventory=['hardware_full', 'software_full', 'name'],
-        filter={'available': [1, 2]}
+        filter={}
     )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
