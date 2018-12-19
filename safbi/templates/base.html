@@ -106,9 +106,9 @@
 	  <ul class="dropdown-menu">
 	    <li>
 	      <a href="{{ url_for('monitoring') }}"
-		 title="Dashboard" data-toggle="tooltip">
-		<i class="fa fa-fw fa-chalkboard-teacher" aria-hidden="true"></i>
-		<span>Dashboard</span>
+		 title="Overview" data-toggle="tooltip">
+		<i class="fa fa-fw fa-chalkboard" aria-hidden="true"></i>
+		<span>Overview</span>
 	      </a>
 	    </li>
 	    <li>
@@ -121,19 +121,42 @@
 	    <li>
 	      <a href="{{ url_for('monitoring', section='inventory') }}"
 		 title="Inventory" data-toggle="tooltip">
-		<i class="fa fa-fw fa-dolly" aria-hidden="true"></i>
+		<i class="fa fa-fw fa-cubes" aria-hidden="true"></i>
 		<span>Inventory</span>
 	      </a>
 	    </li>
-	    <li class="disabled">
+	    <li>
 	      <a href="{{ url_for('monitoring', section='events') }}"
 		 title="Events" data-toggle="tooltip">
 		<i class="fa fa-fw fa-history" aria-hidden="true"></i>
 		<span>Events</span>
 	      </a>
 	    </li>
+	    <li class="disabled">
+	      <a href="{{ url_for('monitoring', section='applications') }}"
+		 title="Events" data-toggle="tooltip">
+		<i class="fa fa-fw fa-rocket" aria-hidden="true"></i>
+		<span>Applications</span>
+	      </a>
+	    </li>	    
 	  </ul>
 	</li>
+	<li class="dropdown">
+	  <a href="#" class="dropdown-toggle" data-toggle="dropdown"
+	     title="Monitoring">
+	    <i class="item fa fa-lg fa-briefcase" aria-hidden="true"></i>
+	    <span class="hiddeable">Projects</span>
+	  </a>
+	  <ul class="dropdown-menu">
+	    <li>
+	      <a href="{{ url_for('monitoring') }}"
+		 title="Dashboard" data-toggle="tooltip">
+		<i class="fa fa-fw fa-chalkboard-teacher" aria-hidden="true"></i>
+		<span>Dashboard</span>
+	      </a>
+	    </li>
+	  </ul>
+	</li>	
 	{% if session.user.admin %}
 	<li class="dropdown">
 	  <a href="#" class="dropdown-toggle" data-toggle="dropdown"
@@ -142,6 +165,12 @@
 	    <span class="hiddeable">Administration</span>
 	  </a>
 	  <ul class="dropdown-menu">
+	    <li>
+    	      <a href="{{ url_for('admin', section='datasources') }}">
+    	    	<i class="fa fa-fw fa-plug" aria-hidden="true"></i>
+    	    	<span>Datasources</span>
+    	      </a>
+	    </li>
 	    <li>
 	      <a href="{{ url_for('admin', section='users') }}">
 		<i class="fa fa-fw fa-users" aria-hidden="true"></i>

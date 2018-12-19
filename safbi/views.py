@@ -2,6 +2,7 @@
 import os
 #import arrow
 import urllib
+import json
 from datetime import datetime
 #from dateutil.relativedelta import relativedelta
 from functools import wraps
@@ -150,12 +151,14 @@ def login():
                 next_url = url_for('index')
         return redirect(urllib.unquote(next_url))
 
+    
 @app.route('/logout')
 def logout():
 #    return redirect(url_for('mavapa.logout'))
     session.pop('user', None)
     session.pop('access_token', None)
     return redirect(url_for('login'))
+
 
 @app.route('/unauthorized')
 def unauthorized():
@@ -164,6 +167,7 @@ def unauthorized():
     else:
         return redirect(url_for('index'))
 
+    
 @app.route('/admin', defaults={'section': 'general'})
 @app.route('/admin/<section>')
 @admin_required
@@ -173,6 +177,7 @@ def admin(section):
     else:
         return render_template('admin/index.html')
 
+    
 @app.route('/monitoring', defaults={'section': 'general'})
 @app.route('/monitoring/<section>')
 @active_user
@@ -185,6 +190,29 @@ def monitoring(section):
         return render_template('monitoring/events.html')
     else:
         return render_template('monitoring/index.html')
+
+
+@app.route('/api/monitoring/problems')
+@active_user
+@db_session(retry=3)
+def api_monitoring_problems():
+    args = request.args.to_dict()
+    data = []
+    raw = []
+    zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
+    data = zapi.trigger.get(
+        output=['description', 'priority', 'value', 'lastchange'],
+        expandDescription=True, monitored=True, only_true=True,
+        skipDependent=True, selectLastEvent='true', selectTags='true',
+        selectItems=['itemid'], selectHosts=['host', 'maintenance_status']
+    )
+    stats = {
+        'total': len(data),
+        'problems': len([d for d in data if d['value'] == '1' ])
+    }
+    return jsonify(datetime=datetime.now(), data=data, stats=stats)
+
 
 @app.route('/api/monitoring/capacity')
 @active_user
@@ -202,6 +230,7 @@ def api_monitoring_capacity():
     )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
+
 @app.route('/api/monitoring/inventory')
 @active_user
 @db_session(retry=3)
@@ -216,7 +245,19 @@ def api_monitoring_inventory():
         selectInventory=['hardware_full', 'software_full', 'name'],
         filter={}
     )
-    return jsonify(datetime=datetime.now(), data=data, total=len(data))
+    sites = []
+    for h in data:
+        if h['inventory']['hardware_full']:
+            hw = json.loads(h['inventory']['hardware_full'])
+            sites.append(hw.get('site'))
+        if h['inventory']['software_full']:
+            sw = json.loads(h['inventory']['software_full'])
+    stats = {
+        'hosts': len(data),
+        'sites': len([s for s in set(sites) if s])
+    }
+    return jsonify(datetime=datetime.now(), data=data, stats=stats, total=stats['hosts'])
+
 
 @app.route('/api/admin/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @db_session(retry=3)

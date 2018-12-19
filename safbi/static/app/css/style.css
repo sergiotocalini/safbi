@@ -1085,3 +1085,112 @@ table tbody tr td.bs-checkbox {
     overflow: auto;  
     transition: 1s opacity;
 }
+
+.text-white {
+    color: #fff !important;
+}
+
+.bg-danger {
+    background-color: #dc3545!important;
+}
+
+.bg-success {
+    background-color: #28a745!important;
+}
+
+.bg-info {
+    background-color: #17a2b8!important;
+}
+
+.bg-warning {
+    background-color: #ffc107!important;
+}
+
+.bg-secondary {
+    background-color: #6c757d!important;
+}
+
+.bg-light {
+    background-color: #f8f9fa!important;
+}
+
+.grid-stack-item-content .info-box {
+    display:block;
+    width:100%;
+    box-shadow:0 1px 1px rgba(0,0,0,0.1);
+    border-radius:2px;
+    height:100%;
+    margin:0px;
+    position:relative;
+}
+.grid-stack-item-content .info-box .icon {
+    border-top-left-radius: 4px;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 4px;
+    display: block;
+    float: left;
+    height: 100%;
+    width: 25%;
+    text-align: center;
+    font-size: 45px;
+    line-height: 90px;
+}
+.grid-stack-item-content .info-box .content {
+    float:left;
+    width:75%;
+    height:100%;
+    position:static;
+    zoom:1;
+}
+
+.grid-stack-item-content .info-box .content .title {
+    text-transform: uppercase;display: block;
+    font-size: 14px; margin: 0px; text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.grid-stack-item-content .info-box .content .text {
+    display: block;text-align:center;
+    font-weight: bold;font-size: 300%;
+}
+
+table tr .text-ellipsis {
+    display: table;
+    table-layout: fixed;
+    /* width: 100%; */
+    white-space: nowrap;
+}
+
+table tr .text-ellipsis > * {
+    display: table-cell;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.table-loading {
+    position: relative;
+}
+
+.table-loading:before {
+    content: "\f013";
+    font-family: "Font Awesome 5 Free";
+    font-size: 100px;
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    font-style: normal;
+    font-weight: 900;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    text-decoration: inherit;
+    z-index: 100;
+    -webkit-animation: fa-spin 2s infinite linear;
+    animation: fa-spin 2s infinite linear;
+}
+

@@ -12,6 +12,7 @@ function validateInput(el) {
     console.log(el, name, value, rval);
     return rval;
 };
+
 function fetch_data(objects) {
     objects['data'] = [];
 
