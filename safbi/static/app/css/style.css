@@ -577,6 +577,7 @@ body {
     padding: 0px 5px;
     height: 100%;
     color: #dedede;
+    position: relative;
 }
 .wrapper .section-header .section-toolbar a:active,
 .wrapper .section-header .section-toolbar a:hover {
@@ -588,6 +589,8 @@ body {
 }
 .wrapper .section-header .section-toolbar a span.badge {
     background-color: #17a2b8;
+    position: absolute;
+    right: 0px;
 }
 .wrapper .section-header .status,
 .wrapper .project-header .progress {
