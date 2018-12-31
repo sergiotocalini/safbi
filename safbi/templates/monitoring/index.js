@@ -56,6 +56,11 @@ function cellStyle(value, row, index, field) {
 function ProblemFormatterHost(value, row) {
     html = ""
     html+= row.hosts[0].host
+    html+= "<span class='pull-right'>";
+    if ( row.hosts[0].maintenance_status == 1 ) {
+	html+= "<i class='fa fa-fw fa-wrench'></i>"
+    }
+    html+= "</span>";
     return html
 };
 

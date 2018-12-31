@@ -80,8 +80,8 @@
 {% endblock %}
 
 {% block modals %}
-{% include "monitoring/modals/capacity_simulation.html" %}
-{% include "monitoring/modals/capacity_filter.html" %}
+{% include "monitoring/capacity/modals/preferences.html" %}
+{% include "monitoring/capacity/modals/simulation.html" %}
 {% endblock %}
 
 {% block scripts %}
@@ -448,9 +448,9 @@ $(document).ready(function () {
 });
 
 {% include "js/common.js" %}
-{% include "monitoring/capacity.js" %}
-{% include "monitoring/modals/capacity_filter.js" %}
-{% include "monitoring/modals/capacity_simulation.js" %}
+{% include "monitoring/capacity/index.js" %}
+{% include "monitoring/capacity/modals/preferences.js" %}
+{% include "monitoring/capacity/modals/simulation.js" %}
 
 function jqlisteners() {
     console.log(1);

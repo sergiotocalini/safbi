@@ -73,7 +73,7 @@
 	      Created on
 	    </th>
 	    <th data-valign="middle" data-align="center"
-		data-field="last_seen" data-formatter="UsersFormatterDate">
+		data-field="last_seen" data-formatter="UsersFormatterDateAgo">
 	      <i class="fa fa-calendar fa-fw"></i>
 	      Last seen
 	    </th>
@@ -332,6 +332,9 @@ function UsersFormatterActions(value, row) {
 }
 function UsersFormatterDate(value, row) {
     return moment(Date.parse(value)).format("YYYY-MM-DD hh:mm");
+}
+function UsersFormatterDateAgo(value, row) {
+    return moment(Date.parse(value)).fromNow();
 }
 </script>
 {% endblock %}

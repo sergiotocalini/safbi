@@ -3,6 +3,8 @@ import os
 #import arrow
 import urllib
 import json
+import numpy as np
+import pandas as pd
 from datetime import datetime
 #from dateutil.relativedelta import relativedelta
 from functools import wraps
@@ -28,6 +30,12 @@ if app.config['DB_TYPE'] == 'mysql':
 else:
     exit(0)
 sql_debug(app.config.get('DB_DEBUG', False))
+
+def safe_execute(default, exception, function, *args):
+    try:
+        return function(*args)
+    except exception:
+        return default
 
 def login_required(f):
     @wraps(f)
@@ -183,11 +191,11 @@ def admin(section):
 @active_user
 def monitoring(section):
     if section == 'capacity':
-        return render_template('monitoring/capacity.html')
+        return render_template('monitoring/capacity/index.html')
     elif section == 'inventory':
-        return render_template('monitoring/inventory.html')
+        return render_template('monitoring/inventory/index.html')
     elif section == 'events':
-        return render_template('monitoring/events.html')
+        return render_template('monitoring/events/index.html')
     else:
         return render_template('monitoring/index.html')
 
@@ -204,8 +212,9 @@ def api_monitoring_problems():
     data = zapi.trigger.get(
         output=['description', 'priority', 'value', 'lastchange'],
         expandDescription=True, monitored=True, only_true=True,
-        skipDependent=True, selectLastEvent='true', selectTags='true',
-        selectItems=['itemid'], selectHosts=['host', 'maintenance_status']
+        skipDependent=True, selectLastEvent='true', selectTags='true', selectItems=['itemid'],
+        selectHosts=['host', 'maintenance_status', 'maintenance_type'],
+        selectInventory=['software_full', 'hardware_full']
     )
     stats = {
         'total': len(data),
@@ -224,9 +233,11 @@ def api_monitoring_capacity():
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     data = zapi.host.get(
-        output=['host', 'status', 'available'], sortfield=['host'],
+        output=['host', 'status', 'available'],
+        sortfield=['host'],
         selectInventory=['hardware_full', 'software_full', 'name'],
-        filter={'available': [1, 2]}, groupids=[16]
+        filter={'available': [1, 2]},
+        groupids=[16]
     )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
 
@@ -240,23 +251,25 @@ def api_monitoring_inventory():
     raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
-    data = zapi.host.get(
-        output=['host', 'status', 'available'], sortfield=['host'],
-        selectInventory=['hardware_full', 'software_full', 'name'],
+    hosts = zapi.host.get(
+        output=['host', 'status', 'available'],
+        sortfield=['host'],
+        selectInventory=['hardware_full', 'software_full'],
         filter={}
     )
+    ifaces = pd.DataFrame(zapi.hostinterface.get())
+    ifaces_attrs = ['interfaceid', 'ip', 'dns', 'port', 'type', 'useip', 'bulk', 'main']
     sites = []
-    for h in data:
-        if h['inventory']['hardware_full']:
-            hw = json.loads(h['inventory']['hardware_full'])
-            sites.append(hw.get('site'))
-        if h['inventory']['software_full']:
-            sw = json.loads(h['inventory']['software_full'])
+    for h in hosts:
+        h['inventory']['hardware_full'] = safe_execute({}, Exception, json.loads, h['inventory']['hardware_full'])
+        h['inventory']['software_full'] = safe_execute({}, Exception, json.loads, h['inventory']['software_full'])
+        h['ifaces'] = ifaces.loc[ifaces['hostid'] == h['hostid'], ifaces_attrs].to_dict(orient='records')
+        sites.append(h['inventory']['hardware_full'].get('site'))
     stats = {
-        'hosts': len(data),
+        'hosts': len(hosts),
         'sites': len([s for s in set(sites) if s])
     }
-    return jsonify(datetime=datetime.now(), data=data, stats=stats, total=stats['hosts'])
+    return jsonify(datetime=datetime.now(), data=hosts, stats=stats, total=stats['hosts'])
 
 
 @app.route('/api/admin/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])

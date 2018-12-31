@@ -160,20 +160,6 @@ function InventoryResponseHandler(res) {
     var data = [];
     for(r in res.data) {
 	var row = res.data[r];
-	if (row.inventory.hardware_full) {
-	    try {
-		row.inventory.hardware_full = JSON.parse(row.inventory.hardware_full);
-	    } catch(e) {
-		continue
-	    }
-	}
-	if (row.inventory.software_full) {
-	    try {
-		row.inventory.software_full = JSON.parse(row.inventory.software_full);
-	    } catch(e) {
-		continue
-	    }
-	}	
 	data.push({
 	    id: row.hostid,
 	    name: row.host,
