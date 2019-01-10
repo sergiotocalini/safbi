@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Monitoring: Events{% endblock %}
+{% block title %}SAfBI - Monitoring: Events{% endblock %}
 
 {% block body %}
 <div class="events-header section-header">
@@ -9,4 +9,49 @@
     Monitoring: Events
   </div>
 </div>
+
+<div class="inventory-content section-content" style="padding: 0% 1%;">
+  <div id="heatmap-container" style="height: 400px; min-width: 310px; max-width: 800px; margin: 0 auto"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-core.min.js"></script>
+<script src="https://cdn.anychart.com/releases/v8/js/anychart-heatmap.min.js"></script>
+<script>
+$(document).ready(function (){
+// create data
+var data = [
+{x: "2010", y: "A", heat: 15},
+{x: "2011", y: "A", heat: 17},
+{x: "2012", y: "A", heat: 21},
+{x: "2010", y: "B", heat: 34},
+{x: "2011", y: "B", heat: 33},
+{x: "2012", y: "B", heat: 32},
+{x: "2010", y: "C", heat: 51},
+{x: "2011", y: "C", heat: 50},
+{x: "2012", y: "C", heat: 47}
+];
+
+// create a chart and set the data
+chart = anychart.heatMap(data);
+
+// set the color range
+var customColorScale = anychart.scales.ordinalColor();
+customColorScale.ranges([
+{less: 20},
+{from: 20, to: 40},
+{greater: 40}
+]);
+customColorScale.colors(["lightgray", "#00ccff", "#ffcc00"]);
+chart.colorScale(customColorScale);
+chart.legend(true);
+
+// set the container id
+chart.container("heatmap-container");
+
+// initiate drawing the chart
+chart.draw();
+});
+</script>
 {% endblock %}

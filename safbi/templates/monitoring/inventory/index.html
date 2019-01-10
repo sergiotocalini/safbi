@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Monitoring: Inventory{% endblock %}
+{% block title %}SAfBI - Monitoring: Inventory{% endblock %}
 
 {% block body %}
 <div class="inventory-header section-header">
@@ -17,20 +17,20 @@
     </button>
   </div>
   <table id="inventory-table"
+	 data-toolbar="#inventory-toolbar"
          data-show-toggle="false" data-show-export="false"
          data-show-columns="true" data-show-multi-sort="true"
-         data-sort-name="id" data-pagination="true" data-only-info-pagination="true"
+         data-sort-name="id" data-pagination="true"
          data-toggle="table" data-search="true" data-striped="true"
          data-show-footer="false" data-page-size="50"
-         data-escape="false" data-side-pagination="server"
-	 data-query-params="InventoryParams"
-	 data-show-refresh="true" data-show-header="true"
+         data-escape="false" data-maintain-selected="true"
+	 data-show-refresh="true" data-row-style="InventoryRowStyle"
 	 data-url="{{ url_for('api_monitoring_inventory') }}?"
 	 data-response-handler="InventoryResponseHandler"
-	 data-toolbar="#inventory-toolbar" data-row-style="InventoryRowStyle"
-	 data-reorderable-columns="true" data-show-pagination-switch="false"
-	 data-detail-view="true"
-	 data-detail-formatter="InventoryDetailFormatter"
+	 data-query-params="InventoryParams"
+	 data-side-pagination="client"
+	 data-show-header="true" data-reorderable-columns="true"
+	 data-detail-view="true" data-detail-formatter="InventoryDetailFormatter"
          class="table-hover table-striped table-compact table-responsive
                 table-condensed table-autosize">
     <thead>
@@ -169,10 +169,7 @@ function InventoryResponseHandler(res) {
 	    available: row.available,
 	});
     };
-    return {
-	total: res.total,
-	rows: data,
-    }
+    return data;
 }
 function InventoryRowStyle(row, index) {
     return {}

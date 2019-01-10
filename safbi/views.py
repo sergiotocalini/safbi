@@ -1,3 +1,4 @@
+
 #!/usr/bin/env python
 import os
 #import arrow
@@ -252,7 +253,7 @@ def api_monitoring_inventory():
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     hosts = zapi.host.get(
-        output=['host', 'status', 'available'],
+        output=['host', 'status', 'available', 'ipmi_available', 'jmx_available', 'snmp_available'],
         sortfield=['host'],
         selectInventory=['hardware_full', 'software_full'],
         filter={}
