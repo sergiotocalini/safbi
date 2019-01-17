@@ -12,13 +12,13 @@
 <div class="inventory-content section-content" style="padding: 0% 1%;">
   <div id="inventory-toolbar" class="toolbar" style="max-height: 10%;padding: 0.5% 0%;">
     <button class="btn btn-primary" type="button" data-toggle="modal"
-	    id="inventory-filter" aria-haspopup="true" aria-expanded="false">
+	    id="inventory-filter" aria-haspopup="true" aria-expanded="false" disabled="disabled">
       <i class="fa fa-fw fa-filter"></i>
     </button>
   </div>
   <table id="inventory-table"
 	 data-toolbar="#inventory-toolbar"
-         data-show-toggle="false" data-show-export="false"
+         data-show-toggle="false" data-show-export="false" data-export-data-type="all"
          data-show-columns="true" data-show-multi-sort="true"
          data-sort-name="id" data-pagination="true"
          data-toggle="table" data-search="true" data-striped="true"
@@ -92,6 +92,7 @@
 
 <link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
 <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+
 <script>
     $(document).ready(function () {
 	$(window).resize(function () {
@@ -234,6 +235,12 @@ function InventoryFormatterSoftware(value, row) {
 		       data: '',
 		       tooltip: row.sw.release
 		     })
+    } else {
+	content.push({ type: 'i',
+		       class: 'far fa-fw fa-question-circle',
+		       data: '',
+		       tooltip: row.sw.release
+		     })	
     }
     if ( row.sw.apps ) {
 	if ( row.sw.apps.kvm ) {

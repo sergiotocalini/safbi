@@ -16,8 +16,9 @@
       <div class="content-bar">
 	{% if session.user %}
 	<div class="toolbar">
-	  <a id="btn-toggled" href="#" title="Toggle">
-	    <i class="fa fa-bars fa-2x"></i>
+	  <a data-init="true" href="#main-sidebar-toggle" data-click="main-sidebar-toggle"
+	     aria-disabled="true" title="Toggle">
+	    <i class="fa fa-2x fa-bars"></i>
 	  </a>
 	  <a id="btn-toggled" href="#" title="Search" class="disabled">
 	    <i class="fa fa-search fa-2x"></i>
@@ -200,13 +201,21 @@
 	{% endif %}
       </ul>
       <div class="footer">
+	<a data-toggle="tooltip" data-placement="top" title="Home"
+	   href="{{ url_for('index') }}" class="hiddeable">
+	  <i class="fa fa-fw fa-home"></i>
+	</a>	
 	<a data-toggle="tooltip" data-placement="top" title="Profile"
 	   href="{{ url_for('index') }}" class="hiddeable">
 	  <i class="fa fa-fw fa-user"></i>
 	</a>
 	<a data-toggle="tooltip" data-placement="top" title="Logout"
-	   href="{{ url_for('logout') }}">
+	   href="{{ url_for('logout') }}" class="hiddeable">
 	  <i class="fa fa-fw fa-sign-out-alt"></i>
+	</a>
+	<a data-init="true" href="#main-sidebar-toggle" data-click="main-sidebar-toggle"
+	   aria-disabled="true" title="Toggle" data-toggle="tooltip" data-placement="top">
+	  <i class="fa fa-fw fa-bars"></i>
 	</a>
       </div>
     </div>
@@ -236,8 +245,8 @@
     <div class="footer-bar">
       <div class="content-bar">
 	<ul class="links">
-	  <span>
-	    <small>©&nbsp; 2016</small>
+	  <span style="padding-left:0px;">
+	    <small>©&nbsp; 2016-2019</small>
 	  </span>
 	  <li>
 	    <a href="#"><small>Developers</small></a>
@@ -262,7 +271,7 @@
   <!-- <script src="{{ config['CDN_MAVAPA'] }}/mavapa.js"></script> -->
   <script>
     $(document).ready(function () {
-	$('#btn-toggled').click(function(e) {
+	$(document).on("click", "[data-click=main-sidebar-toggle]", function(e) {
 	    e.preventDefault();
 	    $('.sidebar').toggleClass("toggled");
 	    $('.header-bar').toggleClass("toggled");
