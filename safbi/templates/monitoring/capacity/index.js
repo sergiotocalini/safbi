@@ -183,9 +183,11 @@ function DetailsLoad(objects) {
     for (data in objects['data']) {
 	var storage_size_total = 0;
 	var storage_size_avail = 0;
+	var storage_size_alloc = 0;
 	for (pool in objects['data'][data]['kvm']['pools']) {
 	    storage_size_total+=Number(objects['data'][data]['kvm']['pools'][pool]['capacity']);
 	    storage_size_avail+=Number(objects['data'][data]['kvm']['pools'][pool]['available']);
+	    storage_size_alloc+=Number(objects['data'][data]['kvm']['pools'][pool]['allocation']);
 	}
 	html ='<table class="table table-striped table-sm table-bordered table-hover">';
 	html+=' <thead style="background: #ededed;">';
@@ -212,7 +214,7 @@ function DetailsLoad(objects) {
 	// html+='    <i class="fa fa-fw fa-ellipsis-v"></i>';
 	// html+='    <span>';
 	// html+='     <i class="fa fa-fw fa-globe"></i> ';
-	// html+=      dataset[data]['kvm']['pools'].length; 
+	// html+=      objects['data'][data]['kvm']['pools'].length; 
 	// html+='    </span>';
 	html+='   </th>';
 	html+='  </tr>';
@@ -240,7 +242,7 @@ function DetailsLoad(objects) {
 	html+='</tr>'
 	html+='</thead>';
 	html+='<tbody>'
-	subtotal = { "domains": 0, "vcpu": 0, "memory": 0, "storage": 0 }
+	subtotal = { "domains": 0, "vcpu": 0, "memory": 0, "storage": 0, 'storage_capacity': 0 }
 	for (dom in objects['data'][data]['kvm']['domains']) {
 	    if ( 'filter' in objects['data'][data]['kvm']['domains'][dom] ) {	
 		if ( objects['data'][data]['kvm']['domains'][dom]['filter'].indexOf(true) < 0 ) {
@@ -286,10 +288,11 @@ function DetailsLoad(objects) {
 	    html+=' </th>';
 	    html+='</tr>';
 
-	    subtotal['domains']+= 1;
-	    subtotal['vcpu']   += Number(objects['data'][data]['kvm']['domains'][dom]['vcpu']);
-	    subtotal['memory'] += Number(objects['data'][data]['kvm']['domains'][dom]['memory']);
-	    subtotal['storage']+= Number(objects['data'][data]['kvm']['domains'][dom]['storage_alloc']);
+	    subtotal['domains']         += 1;
+	    subtotal['vcpu']            += Number(objects['data'][data]['kvm']['domains'][dom]['vcpu']);
+	    subtotal['memory']          += Number(objects['data'][data]['kvm']['domains'][dom]['memory']);
+	    subtotal['storage']         += Number(objects['data'][data]['kvm']['domains'][dom]['storage_alloc']);
+	    subtotal['storage_capacity']+= Number(objects['data'][data]['kvm']['domains'][dom]['storage_capacity']);
 	}
 	
 	html+='</tbody>';
@@ -307,8 +310,12 @@ function DetailsLoad(objects) {
 	html+='   </span>';
 	html+='  </th>';
 	html+='  <th scope="col">';
-	html+='   <span class="pull-right">'
-	html+=     humanSize(subtotal['storage']);
+	var color = "";
+	if ( storage_size_total < subtotal['storage_capacity'] ) {
+	    color = "text-danger";
+	}
+	html+='   <span class="pull-right '+ color +'">'
+	html+=     humanSize(subtotal['storage']) + ' (' + humanSize(subtotal['storage_capacity']) + ' capacity)';
 	html+='   </span>';
 	html+='  </th>';
 	html+=' </tr>';
@@ -327,7 +334,7 @@ function DetailsLoad(objects) {
 	    html+='  </th>';
 	    html+='  <th scope="col">';
 	    html+='   <span class="pull-right">'
-	    html+=     humanSize(storage_size_avail);
+	    html+=     humanSize(storage_size_avail) + ' (' + humanSize(storage_size_alloc) + ' allocated)';
 	    html+='   </span>';
 	    html+='  </th>';
 	    html+=' </tr>';
