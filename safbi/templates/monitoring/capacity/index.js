@@ -310,16 +310,16 @@ function DetailsLoad(objects) {
 	html+='   </span>';
 	html+='  </th>';
 	html+='  <th scope="col">';
-	var color = "";
-	if ( storage_size_total < subtotal['storage_capacity'] ) {
-	    color = "text-danger";
-	}
-	html+='   <span class="pull-right '+ color +'">'
+	html+='   <span class="pull-right">'
 	html+=     humanSize(subtotal['storage']) + ' (' + humanSize(subtotal['storage_capacity']) + ' capacity)';
 	html+='   </span>';
 	html+='  </th>';
 	html+=' </tr>';
 	if ( subtotal['domains'] == objects['data'][data]['kvm']['domains'].length ) {
+	    var color = "";
+	    if ( storage_size_total < subtotal['storage_capacity'] ) {
+		color = "text-danger";
+	    }
 	    html+=' <tr style="font-style:italic; background:#bfccb7">';
 	    html+='  <th scope="col">Available</th>';
 	    html+='  <th scope="col">';
@@ -333,8 +333,8 @@ function DetailsLoad(objects) {
 	    html+='   </span>';
 	    html+='  </th>';
 	    html+='  <th scope="col">';
-	    html+='   <span class="pull-right">'
-	    html+=     humanSize(storage_size_avail) + ' (' + humanSize(storage_size_alloc) + ' allocated)';
+	    html+='   <span class="pull-right '+ color +'">'
+	    html+=     humanSize(storage_size_avail) + ' (' + humanSize(storage_size_total - subtotal['storage_capacity']) + ' capacity)';
 	    html+='   </span>';
 	    html+='  </th>';
 	    html+=' </tr>';
