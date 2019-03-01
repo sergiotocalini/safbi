@@ -126,18 +126,25 @@
 		<span>Inventory</span>
 	      </a>
 	    </li>
-	    <li class="disabled">
+	    <li>
 	      <a href="{{ url_for('monitoring', section='events') }}"
 		 title="Monitoring: Events" data-toggle="tooltip">
 		<i class="fa fa-fw fa-history" aria-hidden="true"></i>
 		<span>Events</span>
 	      </a>
 	    </li>
-	    <li class="disabled">
+	    <li>
 	      <a href="{{ url_for('monitoring', section='applications') }}"
-		 title="Events" data-toggle="tooltip">
+		 title="Monitoring: Applications" data-toggle="tooltip">
 		<i class="fa fa-fw fa-rocket" aria-hidden="true"></i>
 		<span>Applications</span>
+	      </a>
+	    </li>
+	    <li>
+	      <a href="{{ url_for('monitoring', section='maintenance') }}"
+		 title="Monitoring: Maintenance" data-toggle="tooltip">
+		<i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
+		<span>Maintenance</span>
 	      </a>
 	    </li>	    
 	  </ul>

@@ -172,7 +172,7 @@ function OverviewLoad(objects) {
 	    ['cpu',     cpu_perc.toFixed(2)],
 	    ['memory',  mem_perc.toFixed(2)],
 	    ['storage', str_perc.toFixed(2)]
-	]
+	],
     });    
     $('#overview-hosts-count h3').html(hosts);
     $('#overview-domains-count h3').html(domains);

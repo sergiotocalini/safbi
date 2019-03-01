@@ -116,6 +116,7 @@ def before_request():
         else:
             logout()
 
+            
 @db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
@@ -123,10 +124,12 @@ def get_data(table, **kwargs):
     else:
         return select(o for o in eval(table))
 
+    
 @app.route('/')
 @active_user
 def index():
     return render_template('index.html')
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

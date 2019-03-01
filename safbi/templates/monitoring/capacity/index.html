@@ -210,24 +210,22 @@ $(document).ready(function () {
     objects['graph_perf'] = c3.generate({
 	bindto: '#graph-overview-perf',
 	data: {
-	    type: 'gauge',
 	    columns: [
-		['cpu'],
-		['memory'],
-		['storage'],
-	    ]
+		['cpu', 0],
+		['memory', 0],
+		['storage', 0],
+	    ],
+	    type: 'gauge',
 	},
 	gauge: {
-	    label: {
-		show: true
-	    }
+	    show: true
 	},
 	transition: {
 	    duration: 1000
 	},
 	size: {
 	    height: 200
-	}
+        }
     });
     $('.grid-stack').gridstack();
     
