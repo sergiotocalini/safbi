@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}SAfBI - Monitoring: Maintenance{% endblock %}
+
+{% block body %}
+<div class="inventory-header section-header">
+  <div class="title">
+    <i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
+    Monitoring: Maintenance
+  </div>
+</div>
+<div class="section-content" style="padding: 0% 1%;">
+  <div id="maintenance-toolbar" class="toolbar" style="max-height: 10%;padding: 0.5% 0%;">
+    <button class="btn btn-primary" type="button" data-toggle="modal"
+	    id="maintenance-filter" aria-haspopup="true" aria-expanded="false" disabled="disabled">
+      <i class="fa fa-fw fa-filter"></i>
+    </button>
+  </div>
+  <table id="maintenance-table"
+	 data-toolbar="#maintenance-toolbar"
+         data-show-toggle="false" data-show-export="false" data-export-data-type="all"
+         data-show-columns="true" data-show-multi-sort="true"
+         data-sort-name="id" data-pagination="true"
+         data-toggle="table" data-search="true" data-striped="true"
+         data-show-footer="false"
+         data-escape="false" data-maintain-selected="true"
+	 data-show-refresh="true" data-row-style="MaintenanceRowStyle"
+	 data-url="{{ url_for('api_monitoring_maintenance') }}?"
+	 data-response-handler="MaintenanceResponseHandler"
+	 data-query-params="MaintenanceParams"
+	 data-side-pagination="client"
+	 data-show-header="true" data-reorderable-columns="true"
+         class="table-hover table-striped table-compact table-responsive
+                table-condensed table-autosize">
+    <thead>
+      <tr>
+	<th data-field="select" data-visible="true"
+	    data-checkbox="true">
+	  <i class="fa fa-fw fa-check-square"></i>
+	</th>
+	<th data-valign="middle" data-align="center" data-field="id"
+	    data-halign="center" data-sortable="true" data-visible="false">
+	  <i class="fa fa-fw fa-list-ol"></i>
+	  ID
+	</th>
+	<th data-field="start" data-valign="middle"
+	    data-align="center" data-sortable="true"
+	    data-formatter="InventoryFormatterStart">
+          <i class="fa fa-fw date"></i>
+          Start
+        </th>
+	<th data-field="end" data-valign="middle"
+	    data-align="left" data-sortable="true"
+	    data-formatter="InventoryFormatterEnd">
+          <i class="fa fa-fw fa-date"></i>
+          End
+        </th>
+        <th data-field="chassis" data-align="left" data-halign="center" 
+	    data-valign="middle" data-sortable="true" data-visible="false"
+	    data-formatter="InventoryFormatterChassis">
+          <i class="fa fa-fw fa-list-ul"></i>
+          Chassis
+        </th>
+        <th data-field="serial" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterSerial">
+          <i class="fa fa-fw fa-list-ol"></i>
+          Serial
+	</th>
+        <th data-field="hardware" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterHardware">
+          <i class="fa fa-fw fa-clipboard-check"></i>
+          Hardware
+	</th>
+        <th data-field="software" data-align="center" 
+	    data-valign="middle" data-sortable="true"
+	    data-formatter="InventoryFormatterSoftware">
+          <i class="fa fa-fw fa-clipboard-check"></i>
+          Software
+	</th>
+	<th data-field="actions" data-align="center" 
+	    data-valign="middle"
+	    data-formatter="InventoryFormatterActions">
+          <i class="fa fa-fw fa-user-cog"></i>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% endblock %}
+
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+
+<script>
+{% include "monitoring/inventory/index.js" %}
+</script>
+{% endblock %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}SAfBI - Monitoring{% endblock %}
+{% block title %}SAfBI - Monitoring: Problems{% endblock %}
 
 {% block body %}
 <div class="section-refresh fade in disabled"
@@ -12,8 +12,8 @@
 </div>
 <div class="dashboard-header section-header">
   <div class="section-title title">
-    <i class="fa fa-fw fa-chalkboard" aria-hidden="true"></i>
-    Monitoring: Overview
+    <i class="fa fa-fw fa-bug" aria-hidden="true"></i>
+    Monitoring: Problems
   </div>
   <div class="section-toolbar toolbar pull-right">
     <a data-init="true" href="#fullscreen" data-click="section-fullscreen"
@@ -236,7 +236,7 @@ $(document).ready(function () {
 });
 
 {% include "js/common.js" %}
-{% include "monitoring/index.js" %}
+{% include "monitoring/problems/index.js" %}
 
 function jqlisteners() {
     console.log("Refresh")

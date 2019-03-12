@@ -1,26 +1,28 @@
 #!/usr/bin/env python
 import os
-#import arrow
+# import arrow
 import urllib
 import json
-import numpy as np
+# import numpy as np
 import pandas as pd
 from datetime import datetime
-#from dateutil.relativedelta import relativedelta
+# from dateutil.relativedelta import relativedelta
 from functools import wraps
 from flask import Flask, request, render_template, jsonify
 from flask import url_for, abort, redirect, session
-from lib import *
-#from mavapa import mavapa, get_user_data
+from .lib.models import db, commit, db_session, count, select, sql_debug, desc
+from .lib.models import User, Config
+# from mavapa import mavapa, get_user_data
 from pyzabbix import ZabbixAPI
 
 app = Flask(__name__, instance_relative_config=True)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.secret_key = app.config['SECRET_KEY']
-#app.register_blueprint(mavapa, url_prefix='/oauth/mavapa')
+# app.register_blueprint(mavapa, url_prefix='/oauth/mavapa')
 
-if not app.config.has_key('CDN_LOCAL'):
-    app.config['CDN_LOCAL'] = '%s/static' %app.config.get('APPLICATION_ROOT', '')
+if 'CDN_LOCAL' not in app.config:
+    context = app.config.get('APPLICATION_ROOT', '')
+    app.config['CDN_LOCAL'] = '%s/static' % context
 
 if app.config['DB_TYPE'] == 'mysql':
     db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
@@ -31,21 +33,24 @@ else:
     exit(0)
 sql_debug(app.config.get('DB_DEBUG', False))
 
+
 def safe_execute(default, exception, function, *args):
     try:
         return function(*args)
     except exception:
         return default
 
+
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        token = session['access_token'] if session.has_key('access_token') else None
-        user = session['user'] if session.has_key('user') else None
+        token = session['access_token'] if 'access_token' in session else None
+        user = session['user'] if 'user' in session else None
         if token is None or user is None:
             return redirect(url_for('login', next=request.url))
         return f(*args, **kwargs)
     return decorated_function
+
 
 def active_user(f):
     @wraps(f)
@@ -56,6 +61,7 @@ def active_user(f):
         return f(*args, **kwargs)
     return decorated_func
 
+
 def admin_required(f):
     @wraps(f)
     @active_user
@@ -65,6 +71,7 @@ def admin_required(f):
             return redirect(url_for('index'))
         return f(*args, **kwargs)
     return decorated_func
+
 
 @db_session(retry=3)
 def post_login():
@@ -82,10 +89,12 @@ def post_login():
     session['user']['status'] = user.status
     commit()
 
+
 @app.route('/fresh_u/')
 def fresh_user():
     post_login()
     return redirect(url_for('index'))
+
 
 @app.before_request
 @db_session(retry=3)
@@ -116,7 +125,7 @@ def before_request():
         else:
             logout()
 
-            
+
 @db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
@@ -124,7 +133,7 @@ def get_data(table, **kwargs):
     else:
         return select(o for o in eval(table))
 
-    
+
 @app.route('/')
 @active_user
 def index():
@@ -133,7 +142,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-#   return redirect(url_for('mavapa.login', next=request.url))
+    # return redirect(url_for('mavapa.login', next=request.url))
     if not session.get('user'):
         if request.method == 'POST':
             user = get_data('User', email=request.form['email'])
@@ -162,10 +171,10 @@ def login():
                 next_url = url_for('index')
         return redirect(urllib.unquote(next_url))
 
-    
+
 @app.route('/logout')
 def logout():
-#    return redirect(url_for('mavapa.logout'))
+    # return redirect(url_for('mavapa.logout'))
     session.pop('user', None)
     session.pop('access_token', None)
     return redirect(url_for('login'))
@@ -178,7 +187,7 @@ def unauthorized():
     else:
         return redirect(url_for('index'))
 
-    
+
 @app.route('/admin', defaults={'section': 'general'})
 @app.route('/admin/<section>')
 @admin_required
@@ -188,40 +197,45 @@ def admin(section):
     else:
         return render_template('admin/index.html')
 
-    
-@app.route('/monitoring', defaults={'section': 'general'})
+
+@app.route('/monitoring', defaults={'section': None})
 @app.route('/monitoring/<section>')
 @active_user
 def monitoring(section):
-    if section == 'capacity':
+    if section == 'problems':
+        return render_template('monitoring/problems/index.html')
+    elif section == 'capacity':
         return render_template('monitoring/capacity/index.html')
+    elif section == 'maintenance':
+        return render_template('monitoring/maintenance/index.html')
     elif section == 'inventory':
         return render_template('monitoring/inventory/index.html')
     elif section == 'events':
         return render_template('monitoring/events/index.html')
     else:
-        return render_template('monitoring/index.html')
+        return redirect(url_for('monitoring', section="problems"), code=301)
 
 
 @app.route('/api/monitoring/problems')
 @active_user
 @db_session(retry=3)
 def api_monitoring_problems():
-    args = request.args.to_dict()
+    # args = request.args.to_dict()
     data = []
-    raw = []
+    # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     data = zapi.trigger.get(
         output=['description', 'priority', 'value', 'lastchange'],
         expandDescription=True, monitored=True, only_true=True,
-        skipDependent=True, selectLastEvent='true', selectTags='true', selectItems=['itemid'],
+        skipDependent=True, selectLastEvent='true',
+        selectTags='true', selectItems=['itemid'],
         selectHosts=['host', 'maintenance_status', 'maintenance_type'],
         selectInventory=['software_full', 'hardware_full']
     )
     stats = {
         'total': len(data),
-        'problems': len([d for d in data if d['value'] == '1' ])
+        'problems': len([d for d in data if d['value'] == '1'])
     }
     return jsonify(datetime=datetime.now(), data=data, stats=stats)
 
@@ -230,9 +244,9 @@ def api_monitoring_problems():
 @active_user
 @db_session(retry=3)
 def api_monitoring_capacity():
-    args = request.args.to_dict()
+    # args = request.args.to_dict()
     data = []
-    raw = []
+    # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     data = zapi.host.get(
@@ -249,36 +263,92 @@ def api_monitoring_capacity():
 @active_user
 @db_session(retry=3)
 def api_monitoring_inventory():
-    args = request.args.to_dict()
-    data = []
-    raw = []
+    # args = request.args.to_dict()
+    # data = []
+    # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     hosts = zapi.host.get(
-        output=['host', 'status', 'available', 'ipmi_available', 'jmx_available', 'snmp_available'],
+        output=[
+            'host', 'status', 'available',
+            'ipmi_available', 'jmx_available', 'snmp_available'
+        ],
         sortfield=['host'],
         selectInventory=['hardware_full', 'software_full'],
         filter={}
     )
     ifaces = pd.DataFrame(zapi.hostinterface.get())
-    ifaces_attrs = ['interfaceid', 'ip', 'dns', 'port', 'type', 'useip', 'bulk', 'main']
+    ifaces_attrs = [
+        'interfaceid', 'ip', 'dns', 'port', 'type', 'useip', 'bulk', 'main'
+    ]
     sites = []
     for h in hosts:
-        h['inventory']['hardware_full'] = safe_execute({}, Exception, json.loads, h['inventory']['hardware_full'])
-        h['inventory']['software_full'] = safe_execute({}, Exception, json.loads, h['inventory']['software_full'])
-        h['ifaces'] = ifaces.loc[ifaces['hostid'] == h['hostid'], ifaces_attrs].to_dict(orient='records')
+        h['inventory']['hardware_full'] = safe_execute(
+            {}, Exception, json.loads, h['inventory']['hardware_full']
+        )
+        h['inventory']['software_full'] = safe_execute(
+            {}, Exception, json.loads, h['inventory']['software_full']
+        )
+        h['ifaces'] = ifaces.loc[
+            ifaces['hostid'] == h['hostid'], ifaces_attrs
+        ].to_dict(orient='records')
         sites.append(h['inventory']['hardware_full'].get('site'))
     stats = {
         'hosts': len(hosts),
         'sites': len([s for s in set(sites) if s])
     }
-    return jsonify(datetime=datetime.now(), data=hosts, stats=stats, total=stats['hosts'])
+    return jsonify(
+        datetime=datetime.now(), data=hosts, stats=stats, total=stats['hosts']
+    )
+
+
+@app.route('/api/monitoring/maintenance')
+@active_user
+@db_session(retry=3)
+def api_monitoring_maintenance():
+    # args = request.args.to_dict()
+    # data = []
+    # raw = []
+    zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
+    hosts = zapi.host.get(
+        output=[
+            'host', 'status', 'available',
+            'ipmi_available', 'jmx_available', 'snmp_available'
+        ],
+        sortfield=['host'],
+        selectInventory=['hardware_full', 'software_full'],
+        filter={}
+    )
+    ifaces = pd.DataFrame(zapi.hostinterface.get())
+    ifaces_attrs = [
+        'interfaceid', 'ip', 'dns', 'port', 'type', 'useip', 'bulk', 'main'
+    ]
+    sites = []
+    for h in hosts:
+        h['inventory']['hardware_full'] = safe_execute(
+            {}, Exception, json.loads, h['inventory']['hardware_full']
+        )
+        h['inventory']['software_full'] = safe_execute(
+            {}, Exception, json.loads, h['inventory']['software_full']
+        )
+        h['ifaces'] = ifaces.loc[
+            ifaces['hostid'] == h['hostid'], ifaces_attrs
+        ].to_dict(orient='records')
+        sites.append(h['inventory']['hardware_full'].get('site'))
+    stats = {
+        'hosts': len(hosts),
+        'sites': len([s for s in set(sites) if s])
+    }
+    return jsonify(
+        datetime=datetime.now(), data=hosts, stats=stats, total=stats['hosts']
+    )
 
 
 @app.route('/api/admin/configs', methods=['GET', 'POST', 'DELETE', 'PUT'])
 @db_session(retry=3)
 def api_admin_configs():
-    yes = ["yes", "true", "t", "1"]
+    # yes = ["yes", "true", "t", "1"]
     args = request.args.to_dict()
     qfilter = dict((x, args[x]) for x in args if x in ['id', 'key'])
     if qfilter:
@@ -310,6 +380,7 @@ def api_admin_configs():
         abort(400)
     return jsonify(datetime=datetime.now(), data=[])
 
+
 @app.route('/api/admin/configs/all', methods=['GET'])
 @db_session(retry=3)
 def api_admin_configs_all():
@@ -330,7 +401,7 @@ def api_admin_configs_all():
     if args['search']:
         raw = raw.filter(lambda c: args['search'].lower() in c.key.lower())
 
-    if getattr(Customer, args['sort'], None):
+    if getattr(Config, args['sort'], None):
         if args['order'] == 'desc':
             raw = raw.order_by(lambda o: desc(getattr(o, args['sort'])))
         else:
@@ -339,7 +410,10 @@ def api_admin_configs_all():
     for i in raw.limit(int(args['limit']), offset=int(args['offset'])):
         row = i.to_dict(related_objects=False)
         data.append(row)
-    return jsonify(datetime=datetime.now(), data=data, total=count(raw))
+    return jsonify(
+        datetime=datetime.now(), data=data, total=count(raw)
+    )
+
 
 @app.route('/api/admin/users', methods=['GET', 'POST'])
 @db_session(retry=3)
@@ -365,6 +439,7 @@ def api_admin_users():
             abort(400)
     return jsonify(datetime=datetime.now())
 
+
 @app.route('/api/admin/users/all', methods=['GET'])
 @db_session(retry=3)
 def api_admin_users_all():
@@ -377,13 +452,19 @@ def api_admin_users_all():
     args.setdefault('offset', 0)
     args.setdefault('limit', 50)
     args.setdefault('status', None)
-    only_user = ['id', 'userid', 'displayname', 'email', 'avatar',
-                 'status', 'title', 'created_on', 'last_seen']
-    only_team = ['id', 'name', 'description', 'mobile', 'avatar']
+    # only_user = [
+    #     'id', 'userid', 'displayname', 'email', 'avatar',
+    #     'status', 'title', 'created_on', 'last_seen'
+    # ]
+    # only_team = [
+    #     'id', 'name', 'description', 'mobile', 'avatar'
+    # ]
     data = []
     raw = get_data('User')
     if args['search']:
-        raw = raw.filter(lambda o: args['search'].lower() in o.displayname.lower())
+        raw = raw.filter(
+            lambda o: args['search'].lower() in o.displayname.lower()
+        )
 
     if args['status']:
         raw = raw.filter(lambda o: args['status'] == o.status)

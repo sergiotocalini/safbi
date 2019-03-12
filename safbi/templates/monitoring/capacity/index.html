@@ -211,21 +211,29 @@ $(document).ready(function () {
 	bindto: '#graph-overview-perf',
 	data: {
 	    columns: [
-		['cpu', 0],
-		['memory', 0],
-		['storage', 0],
+		['cpu', 100],
+		['memory', 100],
+		['storage', 100],
 	    ],
 	    type: 'gauge',
 	},
 	gauge: {
-	    show: true
+	    label: {
+		show: false,
+	    },
+	},
+	interaction: {
+	    enabled: true
 	},
 	transition: {
 	    duration: 1000
 	},
 	size: {
 	    height: 200
-        }
+        },
+	tooltip: {
+	    show: true,
+	}
     });
     $('.grid-stack').gridstack();
     
