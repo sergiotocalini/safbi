@@ -10,12 +10,10 @@ function jqlisteners_admin_users() {
     $("#admin-users-toolbar button[data-click=user-bulk-update]").unbind();
     $("#admin-users-toolbar button[data-click=user-bulk-update]").on("click", function(e) {
 	e.preventDefault();
-	console.log('bulk update');
     });
     $("#admin-users-toolbar button[data-click=user-bulk-delete]").unbind();
     $("#admin-users-toolbar button[data-click=user-bulk-delete]").on("click", function(e) {
 	e.preventDefault();
-	console.log('bulk delete');
     });
     $(".user-admin").click(function(e) {
 	e.preventDefault();
