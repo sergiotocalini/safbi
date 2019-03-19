@@ -188,14 +188,14 @@ def unauthorized():
         return redirect(url_for('index'))
 
 
-@app.route('/admin', defaults={'section': 'general'})
+@app.route('/admin', defaults={'section': None})
 @app.route('/admin/<section>')
 @admin_required
 def admin(section):
     if section == 'users':
-        return render_template('admin/users.html')
+        return render_template('admin/users/index.html')
     else:
-        return render_template('admin/index.html')
+        return render_template(url_for('admin', section="users"), code=301)
 
 
 @app.route('/monitoring', defaults={'section': None})

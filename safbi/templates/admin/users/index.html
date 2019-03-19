@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}SAfBI - Administration: Users{% endblock %}
+
+{% block body %}
+<div class="admin-users-header section-header">
+  <div class="title">
+    <i class="fa fa-fw fa-users" aria-hidden="true"></i>
+    Administration: Users
+  </div>
+</div>
+<div class="admin-users-content section-content" style="padding: 0% 1%">
+  <div class="menu-information">
+    <div class="admin-users-menu list-group nav nav-tabs" data-tabs="tabs">
+      <a href="#admin-users" data-toggle="tab" class="list-group-item">
+	<i class="fa fa-fw fa-users" aria-hidden="true"></i>
+	Users
+      </a>
+    </div>
+  </div>
+  <div class="admin-tab-content tab-content" style="margin: 0.5% 0%;">
+    <div id="admin-users" class="tab-subcontent tab-pane fade in active">
+      <div id="admin-users-toolbar">
+	<div class="btn-group">
+	  <button class="btn btn-primary" type="button" data-toggle="modal" data-click="user-add"
+		  aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-fw fa-plus"></i>
+	  </button>
+	</div>
+	<div class="btn-group">
+	  <button class="btn btn-success" type="button" data-toggle="modal" data-click="user-bulk-update"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+            <i class="fa fa-fw fa-pencil-alt"></i>
+	  </button>
+	  <button class="btn btn-danger" type="button" data-toggle="modal" data-click="user-bulk-delete"
+		  aria-haspopup="true" aria-expanded="false" disabled="disabled">
+            <i class="fa fa-fw fa-trash"></i>
+	  </button>
+	</div>
+      </div>
+      <table id="table-users" data-show-toggle="false"
+             data-show-toggle="false" data-show-export="false"
+             data-show-columns="false" data-show-multi-sort="true"
+             data-sort-name="displayname" data-pagination="true"
+             data-toggle="table" data-search="true"
+             data-show-footer="false" data-page-size="50"
+             data-escape="false" data-side-pagination="server"
+	     data-query-params="UsersParams" 
+	     data-show-refresh="true" data-row-style="rowStyle"
+	     data-url="{{ url_for('api_admin_users_all') }}?"
+	     data-response-handler="UsersResponseHandler"
+	     data-toolbar="#admin-users-toolbar"
+	     class="table table-hover table-striped table-compact 
+		    table-condensed table-autosize">
+	<thead>
+	  <tr>
+	    <th data-field="select" data-visible="true"
+		data-checkbox="true">
+	      <i class="fa fa-fw fa-check-square"></i>
+	    </th>
+	    <th data-valign="middle" data-visible="false" data-field="id">
+	      <i class="fa fa-key fa-fw"></i>
+	      ID
+	    </th>
+	    <th data-sortable="true" data-halign="center"
+		data-valign="middle" data-field="displayname"
+		data-formatter="UsersFormatterName">
+	      <i class="fa fa-fw fa-user"></i>
+	      Name
+	    </th>
+	    <th data-halign="center" data-valign="middle" 
+		data-align="left" data-field="email">
+	      <i class="fa fa-envelope fa-fw"></i>
+	      Email
+	    </th>
+	    <th data-valign="middle" data-align="center"
+		data-field="last_seen" data-formatter="UsersFormatterDateAgo">
+	      <i class="fa fa-calendar fa-fw"></i>
+	      Last seen
+	    </th>
+	    <th data-valign="middle" data-align="center"
+		data-valign="middle" data-formatter="UsersFormatterActions">
+	      <i class="fa fa-cogs fa-fw"></i>
+	      Actions
+	    </th>
+	  </tr>
+	</thead>
+	<tbody>
+	</tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block modals %}
+{% include "admin/users/modals/user.html" %}
+{% endblock %}
+
+{% block scripts %}
+<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
+
+<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+<script>
+$(document).ready(function () {
+    autosize_tables();
+    $(window).resize(function () {
+	autosize_tables();
+    });
+    $('.modal').on('hidden.bs.modal', function(){
+	$('.modal').find('.modal-title').html('New');
+	var forms = $(this).find('form');
+	forms.each(function(row){
+	    forms[row].reset();
+	});
+	var selectpickers = $(this).find('.selectpicker');
+	selectpickers.each(function(row){
+	    $(selectpickers[row]).selectpicker('refresh');
+	});
+    });
+    jqlisteners();
+});
+
+function jqlisteners() {
+    jqlisteners_admin_users();
+}
+
+{% include "js/common.js" %}
+{% include "admin/users/index.js" %}
+</script>
+{% endblock %}
