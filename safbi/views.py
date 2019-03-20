@@ -22,8 +22,13 @@ app.secret_key = app.config['SECRET_KEY']
 
 if 'CDN_LOCAL' not in app.config:
     context = app.config.get('APPLICATION_ROOT', '')
-    app.config['CDN_LOCAL'] = '%s/static' % context
+    app.config['CDN_LOCAL'] = '%s/static/app' % context
 
+    
+if 'CDN_EXTRAS' not in app.config:
+    app.config['CDN_EXTRAS'] = '%s/static/extras' % context
+
+    
 if app.config['DB_TYPE'] == 'mysql':
     db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
             port=app.config['DB_PORT'], db=app.config['DB_NAME'],
@@ -415,29 +420,39 @@ def api_admin_configs_all():
     )
 
 
-@app.route('/api/admin/users', methods=['GET', 'POST'])
+@app.route('/api/admin/users', methods=['GET', 'PUT', 'POST', 'DELETE'])
 @db_session(retry=3)
 def api_admin_users():
+    required = ['id', 'email', 'userid']
+    args = request.args.to_dict()
+    qfilter = dict((x, args[x]) for x in args if x in required)
+    data = []
     if request.method == 'GET':
-        args = request.args.to_dict()
-        qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
         if qfilter:
             user = get_data('User', **qfilter)
             if user:
                 data = [user.to_dict(exclude="password")]
-                return jsonify(datetime=datetime.now(), data=data)
+            else:
+                abort(404)
     elif request.method == 'POST':
-        args = request.args.to_dict()
-        qfilter = dict((x, args[x]) for x in args if x in ['id', 'email'])
+        content = request.get_json(silent=True)
+        data = [User(**content).to_dict(exclude="password")]
+        commit()
+    elif request.method == 'PUT':
         if qfilter:
             user = get_data('User', **qfilter)
             if user:
                 content = request.get_json(silent=True)
                 user.set(**content)
                 commit()
-        else:
-            abort(400)
-    return jsonify(datetime=datetime.now())
+                data = [user.to_dict(exclude="password")]
+    elif request.method == 'DELETE':
+        if qfilter:
+            user = get_data('User', **qfilter)
+            if user:
+                user.delete()
+                commit()
+    return jsonify(datetime=datetime.now(), data=data)
 
 
 @app.route('/api/admin/users/all', methods=['GET'])

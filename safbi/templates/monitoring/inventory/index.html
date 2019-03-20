@@ -88,10 +88,9 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
 
-<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+{% include "__include__/moment.js.html" %}
+{% include "__include__/bootstrap-table.html" %}
 
 <script>
 {% include "monitoring/inventory/index.js" %}

@@ -1,64 +1,241 @@
-<div id="ModalUser" class="modal fade" tabindex="-1"
-     role="dialog" aria-labelledby="ModalLabel" aria-hidden="true">
-  <div class="modal-vcenter">
-    <div class="modal-dialog" style="height:100%">
-      <div class="modal-content" style="top:50%;transform:translateY(-50%);">
-	<div class="modal-header"
-	     style="background-color: #337ab7; color: #fff;">
-	  <button type="button" class="close"
-		  data-dismiss="modal" aria-hidden="true">
-	    &times;
-	  </button>
-	  <h4 class="modal-title">New</h4>
+<div id="ModalUser" class="modal fade" tabindex="-1" role="dialog"
+     aria-labelledby="ModalLabel" aria-hidden="true" style="overflow: hidden;">
+  <div class="modal-content" style="height:75%;width:60%;top:50%;transform:translateY(-50%);">
+    <div class="modal-header"
+	 style="background-color:#337ab7; color:#fff; height:10%">
+      <button type="button" class="close"
+	      style="position:relative;top:50%;
+		     transform:translateY(-50%);z-index: 100"
+	      data-dismiss="modal" aria-hidden="true">
+	&times;
+      </button>
+      <h4 class="modal-title"
+	  style="position:relative;top:45%;transform:translateY(-50%);float:left">New</h4>
+    </div>
+    <div class="modal-body" style="height:80%;padding:2%;">
+      <div class="user-menu" style="position: relative;
+				    height: 100%;
+				    width: 25%;
+				    float: left;">
+	<div class="user-avatar" style="position: relative;
+					height: 50%;
+					width: 100%;">
+	  <img id="user-form-basic-avatar" class="img-circle"
+	       style="width: auto;
+		      padding: 0% 1%;
+		      left: 50%;
+		      top: 50%;
+		      position: relative;
+		      transform: translateX(-50%) translateY(-50%);
+		      height: auto;
+		      max-width: 85%;
+		      max-height: 85%;"/>
 	</div>
-	<div class="modal-body">
-	  <img id="avatar" class="img-circle"
-	       style="float:left; width:25%; padding:5% 0.5%;"/>
-	  <form class="form-horizontal" 
-		style="float:left; width:65%;padding:5% 5%;"
+	<ul id="user-menu-context" class="list-group" style="overflow-y:auto;max-height:50%;
+							     position:absolute;bottom:0px;width:100%;
+							     padding:0px;margin-bottom:0px;cursor: pointer;">
+	  <li href="#user-form-basic" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-user" aria-hidden="true"></i>
+	    Basic
+	  </li>
+	  <li href="#user-form-settings" data-toggle="tab" class="list-group-item">
+	    <i class="fa fa-fw fa-wrench" aria-hidden="true"></i>
+	    Settings
+	  </li>
+	  <li href="#user-form-auth" data-toggle="tab" class="list-group-item disabled">
+	    <i class="fa fa-fw fa-user-shield" aria-hidden="true"></i>
+	    Authentication
+	  </li>
+	</ul>
+      </div>
+      <div class="user-content tab-content" style="width: 75%;
+						   position: relative;
+						   height: 100%;
+						   float: left;">
+	<div id="user-form-basic" class="tab-subcontent tab-pane fade in active" style="position: relative;
+											width: 100%;
+											height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
 		role="form" method="POST">
-	    <fieldset id="fieldset">
-	      <input class="col-md-8 form-control-static hidden" id="uid">
-	      <div class="form-group">
-		<label class="col-md-4 control-label" for="userid">
-		  User ID
-		</label>
-		<div class="col-md-8 form-control-static" id="userid"></div>
-	      </div>	      
-	      <div class="form-group">
-		<label class="col-md-4 control-label" for="email">
-		  Email
-		</label>
-		<div class="col-md-8 form-control-static" id="email"></div>
+	    <fieldset>
+	      <input type="text" class="hidden" id="user-form-basic-id" autofocus>
+	      <div class="row" style="margin:0px">
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="user-form-basic-displayname">
+		    <i class="fa fa-fw fa-list"></i>
+		    Display Name
+		  </label>
+		  <input type="text" class="form-control"
+			 id="user-form-basic-displayname" readonly>
+		</div>
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="user-form-basic-email">
+		    <i class="fa fa-fw fa-envelope"></i>
+		    Email
+		  </label>
+		  <input type="text" class="form-control"
+			 id="user-form-basic-email" readonly>
+		</div>
 	      </div>
-	      <div class="form-group">
-		<label class="col-md-4 control-label" for="display">
-		  Display
-		</label>
-		<div class="col-md-8 form-control-static" id="display"></div>
+	      <div class="row" style="margin:0px">
+    		<div class="col-md-6 form-group">
+		  <label class="control-label" for="user-form-basic-title">
+		    <i class="fa fa-fw fa-shield-alt"></i>
+		    Title
+		  </label>
+		  <input type="text" class="form-control"
+			 id="user-form-basic-title" readonly>
+		</div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="user-form-basic-locale">
+		    <i class="fa fa-fw fa-language"></i>
+		    Language
+		  </label>
+		  <select class="selectpicker show-tick form-control" data-container="body"
+			  data-tick-icon="fa fa-fw fa-check" title="--- Select ---"
+			  id="user-form-basic-locale" name="lang">
+		    <option value="English" data-tokens="English"
+			    data-content="<span class='flag-icon flag-icon-us'></span> English">
+		      English
+		    </option>
+		    <option value="German" data-tokens="German"
+			    data-content="<span class='flag-icon flag-icon-de'></span> German">
+		      German
+		    </option>
+		    <option value="Italian" data-tokens="Italian"
+			    data-content="<span class='flag-icon flag-icon-it'></span> Italian">
+		      Italian
+		    </option>
+		    <option value="Portuguese" data-tokens="Portuguese"
+			    data-content="<span class='flag-icon flag-icon-pt'></span> Portuguese">
+		      Portuguese
+		    </option>
+		    <option value="Spanish" data-tokens="Spanish"
+			    data-content="<span class='flag-icon flag-icon-es'></span> Spanish">
+		      Spanish
+		    </option>
+		  </select>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 form-group"></div>
+		<div class="col-md-6 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-clock"></i>
+		    Timezone
+		  </label>
+		  <select class="selectpicker show-tick form-control" data-container="body"
+			  data-tick-icon="fa fa-fw fa-check" title="--- Select ---"
+			  id="user-form-basic-timezone" name="timezone" data-live-search="true">
+		    <optgroup label="America">
+		      <option value="America/Argentina/Buenos_Aires"
+			      data-tokens="Buenos Aires"
+			      data-content="<span class='flag-icon flag-icon-ar'></span> Argentina/Buenos Aires">
+			America/Argentina/Buenos_Aires
+		      </option>
+		    </optgroup>
+		    <optgroup label="Europe">
+		      <option value="Europe/Warsaw"
+			      data-tokens="Warsaw"
+			      data-content="<span class='flag-icon flag-icon-pl'></span> Warsaw">
+			Europe/Warsaw
+		      </option>		    
+		      <option value="Europe/Zurich"
+			      data-tokens="Zurich"
+			      data-content="<span class='flag-icon flag-icon-ch'></span> Zurich">
+			Europe/Zurich
+		      </option>
+		    </optgroup>
+		  </select>
+		</div>
 	      </div>
 	    </fieldset>
 	  </form>
 	</div>
-	<div class="modal-footer" 
-	     style="width:100%;bottom:0px">
-	  <div class="pull-left">
-	    <a class="user-admin"
-	       style="outline: none;text-decoration: none;cursor: pointer;">
-	      <i class="fa fa-fw fa-2x" aria-hidden="true"></i>
-	    </a>
-	    <a class="user-lock"
-	       style="outline: none;text-decoration: none;cursor: pointer;">
-	      <i class="fa fa-fw fa-2x" aria-hidden="true"></i>
-	    </a>
-	  </div>
-	  <div class="pull-right">
-	    <button type="button" class="btn btn-default"
-		    data-dismiss="modal">
-	      Close
-	    </button>
-	  </div>
+	<div id="user-form-settings" class="tab-subcontent tab-pane fade in" style="position: relative;
+										    width: 100%;
+										    height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="genre">
+		    <i class="fa fa-fw fa-user-shield"></i>
+		    Administrator
+		  </label>
+		  <div>
+		    <input id="user-form-settings-admin" type="checkbox" data-toggle="toggle"
+			   data-on="Yes" data-off="No" data-width="100%" data-onstyle="warning"
+			   data-offstyle="primary">
+		  </div>
+		</div>
+	      </div>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="timezone">
+		    <i class="fa fa-fw fa-user-slash"></i>
+		    Status
+		  </label>
+		  <div>
+		    <input id="user-form-settings-status" type="checkbox" data-toggle="toggle"
+			   data-on="Active" data-off="Blocked" data-width="100%" data-onstyle="success"
+			   data-offstyle="danger">
+		  </div>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
 	</div>
+	<div id="user-form-auth" class="tab-subcontent tab-pane fade in" style="position: relative;
+										width: 100%;
+										height: 100%;">
+	  <form style="float: left;
+		       top: 50%;
+		       left: 50%;
+		       position: relative;
+		       width: 90%;
+		       transform: translateX(-50%) translateY(-50%);"
+		role="form" method="POST">
+	    <fieldset>
+	      <div class="row" style="margin:0px">
+		<div class="col-md-6 col-md-offset-3 form-group">
+		  <label class="control-label" for="user-form-auth-userid">
+		    <i class="fa fa-fw fa-key"></i>
+		    Account ID
+		  </label>
+		  <input type="text" class="form-control"
+			 id="user-form-auth-userid" readonly>
+		</div>
+	      </div>
+	    </fieldset>
+	  </form>
+	</div>
+
+      </div>
+    </div>
+    <div class="modal-footer" style="height:10%">
+      <div class="pull-left" style="top: 50%;position: relative;transform: translateY(-50%);padding-left:1%;">
+	<i id="ModalUserLoading" class="fa fa-fw fa-3x" aria-hidden="true"></i>
+      </div>
+      <div class="pull-right" style="top: 50%;position: relative;transform: translateY(-50%);padding-right:1%;">
+	<button type="button" class="btn btn-default"
+		data-dismiss="modal">
+	  Close
+	</button>
+	<button type="button" class="btn btn-primary" data-click="user-update">
+	  Save
+	</button>
       </div>
     </div>
   </div>

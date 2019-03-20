@@ -156,7 +156,7 @@ function InventoryFormatterSoftware(value, row) {
 	if ( row.sw.apps.kvm ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/kvm.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/kvm.png',
     			   data: row.sw.apps.kvm.domains.length,
     			   tooltip: row.sw.apps.kvm.node.version_hv
     			 })
@@ -164,7 +164,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.redis ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/redis.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/redis.png',
     			   data: row.sw.apps.redis.databases,
     			   tooltip: row.sw.apps.redis.version
     			 })
@@ -172,7 +172,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.elastic ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/elastic.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/elastic.png',
     			   data: row.sw.apps.elastic.indices,
     			   tooltip: row.sw.apps.elastic.version
     			 })
@@ -180,7 +180,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.splunk ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/splunk.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/splunk.png',
     			   data: row.sw.apps.splunk.indexes,
     			   tooltip: row.sw.apps.splunk.version
     			 })
@@ -188,7 +188,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.docker ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/docker.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/docker.png',
     			   data: row.sw.apps.docker.containers,
     			   tooltip: row.sw.apps.docker.version
     			 })
@@ -196,7 +196,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.arango ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/arango.jpg',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/arango.jpg',
 			   data: '',
     			   tooltip: row.sw.apps.arango.version
     		     })
@@ -204,7 +204,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.springboot ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/springboot.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/springboot.png',
     			   data: row.sw.apps.springboot.length,
     			   tooltip: 'Applications: ' + row.sw.apps.springboot.length
     			 })
@@ -212,7 +212,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.gunicorn ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/gunicorn.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/gunicorn.png',
     			   data: row.sw.apps.gunicorn.length,
     			   tooltip: 'Applications: ' + row.sw.apps.gunicorn.length
     			 })
@@ -220,7 +220,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.dovecot ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/dovecot.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/dovecot.png',
     			   data: row.sw.apps.dovecot.users,
     			   tooltip: row.sw.apps.dovecot.version
     			 })
@@ -228,7 +228,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.mysql ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/mysql.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/mysql.png',
     			   data: row.sw.apps.mysql.databases,
     			   tooltip: row.sw.apps.mysql.version
     			 })
@@ -236,7 +236,7 @@ function InventoryFormatterSoftware(value, row) {
     	if ( row.sw.apps.postgres ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/postgres.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/postgres.png',
     			   data: row.sw.apps.postgres.databases,
     			   tooltip: row.sw.apps.postgres.version
     			 })
@@ -244,7 +244,7 @@ function InventoryFormatterSoftware(value, row) {
 	if ( row.sw.apps.openldap ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/openldap.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/openldap.png',
 			   data: '',
     			   tooltip: row.sw.apps.openldap.version
     			 })
@@ -252,7 +252,7 @@ function InventoryFormatterSoftware(value, row) {
 	if ( row.sw.apps.logstash ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/logstash.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/logstash.png',
 			   data: '',
     			   tooltip: row.sw.apps.logstash.version
     			 })
@@ -260,7 +260,7 @@ function InventoryFormatterSoftware(value, row) {
 	if ( row.sw.apps.jenkins ) {
     	    content.push({ type: 'img',
 			   class: 'fa fa-fw img-circle',
-			   src: '{{ config["CDN_LOCAL"] }}/extras/services/img/jenkins.png',
+			   src: '{{ config["CDN_EXTRAS"] }}/services/img/jenkins.png',
 			   data: '',
     			   tooltip: row.sw.apps.jenkins.version
     			 })

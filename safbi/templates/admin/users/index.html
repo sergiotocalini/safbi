@@ -98,34 +98,21 @@
 {% endblock %}
 
 {% block scripts %}
-<script src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.17.1/moment.min.js"></script>
-
-<link href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.css" rel="stylesheet">
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.js"></script>
+{% include "__include__/moment.js.html" %}
+{% include "__include__/flag-icon.html" %}
+{% include "__include__/bootstrap-table.html" %}
+{% include "__include__/bootstrap-select.html" %}
+{% include "__include__/bootstrap-toggle.html" %}
+{% include "__include__/bootstrap-confirmation.html" %}
 <script>
 $(document).ready(function () {
-    autosize_tables();
-    $(window).resize(function () {
-	autosize_tables();
-    });
-    $('.modal').on('hidden.bs.modal', function(){
-	$('.modal').find('.modal-title').html('New');
-	var forms = $(this).find('form');
-	forms.each(function(row){
-	    forms[row].reset();
-	});
-	var selectpickers = $(this).find('.selectpicker');
-	selectpickers.each(function(row){
-	    $(selectpickers[row]).selectpicker('refresh');
-	});
-    });
-    jqlisteners();
+    admin_users_onStartUp();
 });
 
 function jqlisteners() {
-    jqlisteners_admin_users();
+    admin_users_jqlisteners();
 }
-
+{% include "base.js" %}
 {% include "js/common.js" %}
 {% include "admin/users/index.js" %}
 </script>

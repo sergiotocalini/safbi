@@ -3,11 +3,11 @@
   <head>
     <title>{% block title %}{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/app/img/favicon.ico" type="image/x-icon"/>    
+    <link rel="shortcut icon" href="{{ config['CDN_LOCAL'] }}/img/favicon.ico" type="image/x-icon"/>    
     <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ config['CDN_BOOTSTRAP'] }}/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="{{ config['CDN_FONTAWESOME'] }}/css/fontawesome-all.css" rel="stylesheet">
-    <link href="{{ config['CDN_LOCAL'] }}/app/css/style.css" rel="stylesheet">
+    <link href="{{ config['CDN_LOCAL'] }}/css/style.css" rel="stylesheet">
 <!--    <link href="{{ config['CDN_MAVAPA'] }}/mavapa.css" rel="stylesheet"> -->
   </head>
   <body>
@@ -83,7 +83,7 @@
     <div class="sidebar navbar toggled" role="navigation">
       <div class="logo">
 	<a href="{{ url_for('index') }}">
-	  <img src="{{ config['CDN_LOCAL'] }}/app/img/logo.png" alt="logo">
+	  <img src="{{ config['CDN_LOCAL'] }}/img/logo.png" alt="logo">
 	</a>
       </div>
       <div class="clearfix"></div>
