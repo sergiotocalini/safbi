@@ -24,11 +24,9 @@ if 'CDN_LOCAL' not in app.config:
     context = app.config.get('APPLICATION_ROOT', '')
     app.config['CDN_LOCAL'] = '%s/static/app' % context
 
-    
 if 'CDN_EXTRAS' not in app.config:
     app.config['CDN_EXTRAS'] = '%s/static/extras' % context
 
-    
 if app.config['DB_TYPE'] == 'mysql':
     db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
             port=app.config['DB_PORT'], db=app.config['DB_NAME'],
