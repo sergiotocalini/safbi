@@ -1066,6 +1066,9 @@ table tbody tr td.bs-checkbox {
 .status-yellow {
     color: #e8d906;
 }
+.status-orange {
+    color: #FFA059;
+}
 @media print {
   body * {
     visibility: hidden;
@@ -1115,6 +1118,10 @@ table tbody tr td.bs-checkbox {
 
 .bg-light {
     background-color: #f8f9fa!important;
+}
+
+.bg-average {
+    background-color: #FFA059!important;
 }
 
 .grid-stack-item-content .info-box {

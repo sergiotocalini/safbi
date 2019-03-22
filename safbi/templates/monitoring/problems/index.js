@@ -136,13 +136,13 @@ function ProblemFormatterDescription(value, row) {
 };
 
 function ProblemFormatterActions(value, row) {
-    html ='<a class="problem-open" data-toggle="confirmation" ';
-    html+='   data-host="' + row.id + '" data-container="body" href="#problem-open">';
+    html ='<a class="problem-open" data-toggle="confirmation" target="_blank" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="' + row.link + '">';
     html+=' <i class="fa fa-fw fa-search"></i>';
     html+='</a>';
     html+='<a class="problem-ack" data-toggle="confirmation" ';
     html+='   data-host="' + row.id + '" data-container="body" href="#problem-ack">';
-    html+=' <i class="fa fa-fw fa-exclamation-triangle status-green"></i>';
+    html+=' <i class="fa fa-fw fa-exclamation-triangle status-orange"></i>';
     html+='</a>';
     return html;
 };

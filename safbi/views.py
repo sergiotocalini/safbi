@@ -227,6 +227,7 @@ def api_monitoring_capacity():
     data = []
     # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.timeout = 10
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     data = zapi.host.get(
         output=['host', 'status', 'available'],
@@ -253,6 +254,7 @@ def api_monitoring_inventory():
     # data = []
     # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.timeout = 10
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     hosts = zapi.host.get(
         output=[
@@ -295,6 +297,7 @@ def api_monitoring_problems():
     # args = request.args.to_dict()
     # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.timeout = 10
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     triggers = zapi.trigger.get(
         output=['description', 'priority', 'value', 'lastchange'],
@@ -313,6 +316,10 @@ def api_monitoring_problems():
         filter={}
     ))
     for t in triggers:
+        t['link'] = '%s/tr_events.php?triggerid=%s&eventid=%s' % (
+            app.config['ZABBIX_HOST'],
+            t['triggerid'], t['lastEvent']['eventid']
+        )
         for h in t['hosts']:
             match = hosts.loc[
                 hosts['hostid'] == h['hostid']
@@ -342,6 +349,7 @@ def api_monitoring_maintenance():
     # data = []
     # raw = []
     zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.timeout = 10
     zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
     hosts = zapi.host.get(
         output=[
