@@ -25,6 +25,7 @@ function admin_users_jqlisteners() {
 	$(modal).find('#user-form-basic-title').prop('readonly', readonly);
 	$(modal).find('#user-form-basic-locale').selectpicker('val', 'English').prop('disabled', readonly);
 	$(modal).find('#user-form-basic-timezone').selectpicker('val', 'Europe/Zurich').prop('disabled', readonly);
+	$(modal).find('#user-form-settings-admin').prop('checked', false).change();
 	$(modal).find('#user-form-settings-status').prop('checked', true).change();
 	$(modal).find('#user-menu-context li[href="#user-form-basic"]').tab('show');
 	$(modal).modal('show');
