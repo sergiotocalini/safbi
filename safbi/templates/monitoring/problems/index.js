@@ -1,7 +1,6 @@
 function refreshFrame() {
     refresh_widgets_problems();
-    refresh_widgets_inventory();
-    setTimeout(refreshFrame, 30000);
+    setTimeout(refreshFrame, 60000);
 };
 
 function refresh_widgets_problems() {
@@ -9,22 +8,14 @@ function refresh_widgets_problems() {
 	type: "GET",
 	url: "{{ url_for('api_monitoring_problems') }}",
 	success: function (e) {
-	    $('#problem-box-table').bootstrapTable('load', e['data']);
-	    $('#problem-box-count').find('.content').find('.text').html(e['stats']['problems']);
+	    $('#problems-box-table').bootstrapTable('load', e['data']);
+	    $('#problems-box-count').find('.content').find('.text').html(e['stats']['problems']);
+	    $('#problems-box-hosts-count').find('.content').find('.text').html(e['stats']['hosts']);
+	    $('#problems-box-sites-count').find('.content').find('.text').html(e['stats']['sites']);
+	    $('#problems-box-datasources-count').find('.content').find('.text').html(e['stats']['datasources']);
 	}
     });
-}
-
-function refresh_widgets_inventory() {
-    $.ajax({
-	type: "GET",
-	url: "{{ url_for('api_monitoring_inventory') }}",
-	success: function (e) {
-	    $('#inventory-box-hosts-count').find('.content').find('.text').html(e['stats']['hosts']);
-	    $('#inventory-box-sites-count').find('.content').find('.text').html(e['stats']['sites']);
-	}
-    });
-}
+};
 
 function cellStyle(value, row, index, field) {
     if ( field == "priority" ) {
@@ -51,7 +42,13 @@ function cellStyle(value, row, index, field) {
 	}
     }
     return {}
-}
+};
+
+function ProblemFormatterSite(value, row) {
+    var html = "";
+    html+= row.hosts[0].hardware_full.site ? row.hosts[0].hardware_full.site : '-';
+    return html
+};
 
 function ProblemFormatterHost(value, row) {
     html = ""
@@ -59,6 +56,15 @@ function ProblemFormatterHost(value, row) {
     html+= "<span class='pull-right'>";
     if ( row.hosts[0].maintenance_status == 1 ) {
 	html+= "<i class='fa fa-fw fa-wrench'></i>"
+    }
+    if ( row.hosts[0].software_full.env == 'PROD' ) {
+	html+=' <i class="fa fa-fw fa-flag status-red" title="PROD"></i>';
+    } else if ( row.hosts[0].software_full.env == 'TEST' ) {
+	html+=' <i class="fa fa-fw fa-flag status-yellow" title="TEST"></i>';
+    } else if ( row.hosts[0].software_full.env == 'STAGE' ) {
+	html+=' <i class="fa fa-fw fa-flag status-blue" title="STAGE"></i>';
+    } else {
+	html+=' <i class="fa fa-fw fa-flag status-gray" title="UNKNOWN"></i>';
     }
     html+= "</span>";
     return html
@@ -126,5 +132,17 @@ function ProblemFormatterDescription(value, row) {
     html += '<div class="text-ellipsis">'
     html +=  '<span>' + value + '</span>';
     html += '</div>'
+    return html;
+};
+
+function ProblemFormatterActions(value, row) {
+    html ='<a class="problem-open" data-toggle="confirmation" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="#problem-open">';
+    html+=' <i class="fa fa-fw fa-search"></i>';
+    html+='</a>';
+    html+='<a class="problem-ack" data-toggle="confirmation" ';
+    html+='   data-host="' + row.id + '" data-container="body" href="#problem-ack">';
+    html+=' <i class="fa fa-fw fa-exclamation-triangle status-green"></i>';
+    html+='</a>';
     return html;
 };

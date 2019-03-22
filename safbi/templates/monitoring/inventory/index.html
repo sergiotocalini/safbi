@@ -35,6 +35,10 @@
                 table-condensed table-autosize">
     <thead>
       <tr>
+	<th data-field="select" data-visible="true"
+	    data-checkbox="true">
+	  <i class="fa fa-fw fa-check-square"></i>
+	</th>
 	<th data-field="site" data-valign="middle"
 	    data-align="center" data-sortable="true"
 	    data-formatter="InventoryFormatterSite">
@@ -88,7 +92,6 @@
 {% endblock %}
 
 {% block scripts %}
-
 {% include "__include__/moment.js.html" %}
 {% include "__include__/bootstrap-table.html" %}
 

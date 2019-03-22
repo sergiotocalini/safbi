@@ -164,7 +164,7 @@ def login():
                     next_url = request.args.get("next")
                     if next_url is None:
                         next_url = url_for('index')
-                return redirect(urllib.unquote(next_url))
+                return redirect(urllib.parse.unquote(next_url))
         return render_template('login.html')
     else:
         next_url = session.pop('next_url', None)
@@ -172,7 +172,7 @@ def login():
             next_url = request.args.get("next")
             if next_url is None:
                 next_url = url_for('index')
-        return redirect(urllib.unquote(next_url))
+        return redirect(urllib.parse.unquote(next_url))
 
 
 @app.route('/logout')
@@ -219,30 +219,6 @@ def monitoring(section):
         return redirect(url_for('monitoring', section="problems"), code=301)
 
 
-@app.route('/api/monitoring/problems')
-@active_user
-@db_session(retry=3)
-def api_monitoring_problems():
-    # args = request.args.to_dict()
-    data = []
-    # raw = []
-    zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
-    zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
-    data = zapi.trigger.get(
-        output=['description', 'priority', 'value', 'lastchange'],
-        expandDescription=True, monitored=True, only_true=True,
-        skipDependent=True, selectLastEvent='true',
-        selectTags='true', selectItems=['itemid'],
-        selectHosts=['host', 'maintenance_status', 'maintenance_type'],
-        selectInventory=['software_full', 'hardware_full']
-    )
-    stats = {
-        'total': len(data),
-        'problems': len([d for d in data if d['value'] == '1'])
-    }
-    return jsonify(datetime=datetime.now(), data=data, stats=stats)
-
-
 @app.route('/api/monitoring/capacity')
 @active_user
 @db_session(retry=3)
@@ -260,6 +236,13 @@ def api_monitoring_capacity():
         groupids=[16]
     )
     return jsonify(datetime=datetime.now(), data=data, total=len(data))
+
+
+@app.route('/api/monitoring/host', methods=['GET', 'PUT', 'POST', 'DELETE'])
+@db_session
+def api_monitoring_host():
+    args = request.args.to_dict()
+    return jsonify(datetime=datetime.now())
 
 
 @app.route('/api/monitoring/inventory')
@@ -304,6 +287,52 @@ def api_monitoring_inventory():
         datetime=datetime.now(), data=hosts, stats=stats, total=stats['hosts']
     )
 
+
+@app.route('/api/monitoring/problems')
+@active_user
+@db_session(retry=3)
+def api_monitoring_problems():
+    # args = request.args.to_dict()
+    # raw = []
+    zapi = ZabbixAPI(app.config['ZABBIX_HOST'])
+    zapi.login(app.config['ZABBIX_USER'], app.config['ZABBIX_PASS'])
+    triggers = zapi.trigger.get(
+        output=['description', 'priority', 'value', 'lastchange'],
+        expandDescription=True, monitored=True, only_true=True,
+        skipDependent=True, selectLastEvent='true',
+        selectTags='true', selectItems=['itemid'],
+        selectHosts=['host', 'maintenance_status', 'maintenance_type'],
+    )
+    hosts = pd.DataFrame(zapi.host.get(
+        output=[
+            'host', 'status', 'available',
+            'ipmi_available', 'jmx_available', 'snmp_available'
+        ],
+        sortfield=['host'],
+        selectInventory=['hardware_full', 'software_full'],
+        filter={}
+    ))
+    for t in triggers:
+        for h in t['hosts']:
+            match = hosts.loc[
+                hosts['hostid'] == h['hostid']
+            ].iloc[0]
+            h['hardware_full'] = safe_execute(
+                {}, Exception, json.loads, match['inventory']['hardware_full']
+            )
+            h['software_full'] = safe_execute(
+                {}, Exception, json.loads, match['inventory']['software_full']
+            )
+    stats = {
+        'datasources': 1, 'hosts': len(hosts),
+        'sites': len(hosts.inventory.apply(pd.Series).hardware_full.apply(
+            lambda x: safe_execute({}, Exception, json.loads, x)
+        ).apply(pd.Series).site.dropna().unique()),
+        'total': len(triggers),
+        'problems': len([d for d in triggers if d['value'] == '1'])
+    }
+    return jsonify(datetime=datetime.now(), data=triggers, stats=stats)
+    
 
 @app.route('/api/monitoring/maintenance')
 @active_user
