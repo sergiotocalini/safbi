@@ -134,9 +134,10 @@ function InventoryFormatterSerial(value, row) {
 function InventoryFormatterSoftware(value, row) {
     var content = [];
     if ( row.sw.family == 'Linux' ) {
+	var updates = row.sw.updates.normal + row.sw.updates.security;
 	content.push({ type: 'i',
 		       class: 'fab fa-fw fa-linux',
-		       data: '',
+		       data: updates > 0 ? updates : '',
 		       tooltip: row.sw.release
 		     })
     } else if ( row.sw.family == 'Windows' ) {
