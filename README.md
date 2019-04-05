@@ -1,11 +1,4 @@
-********
-SafBI
-********
+# SafBI
 
-.. image:: https://pypi.org/project/safbi.svg
-   :target: https://pypi.org/project/safbi
-   :alt: PyPI Package
-   
-.. image:: https://img.shields.io/badge/license-GPLv3-brightgreen.svg
-   :target: LICENSE
-   :alt: Repository License
+[![PyPI Package](https://pypi.org/project/safbi.svg)](https://pypi.org/project/safbi)
+[![Repository License](https://img.shields.io/badge/license-GPLv3-brightgreen.svg)](LICENSE)
