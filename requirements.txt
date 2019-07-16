@@ -7,7 +7,7 @@ idna
 itsdangerous
 Jinja2
 MarkupSafe
-pkg-resources
+gunicorn
 pony
 PyMySQL
 pyzabbix
@@ -16,3 +16,4 @@ urllib3
 Werkzeug
 numpy
 pandas
+cryptography

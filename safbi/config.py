@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import os
+
 
 class Config(object):
     BIND = '0.0.0.0'
@@ -23,13 +23,18 @@ class Config(object):
     ZABBIX_USER = "Admin"
     ZABBIX_PASS = "zabbix"
 
+
 class Local(Config):
     DEBUG = True
     DB_DEBUG = True
     DB_HOST = 'localhost'
-    DB_USER = 'safbi_local_admin'
-    DB_PASS = 'pedro12345'
+    DB_USER = 'app_safbi'
+    DB_PASS = '1234567890'
 #    MAVAPA_URL = 'http://localhost:7001/mavapa'
 #    CLIENT_ID = 'MjjJVBFCmFsFsPYaip662zCd'
 #    CLIENT_SECRET = 'qXOxQ0NzYdBOZ9TWChXU41t8'
 #    REDIRECT_URI = 'http://localhost:7006/pichai/oauth/code/'
+
+
+class Docker(Local):
+    DB_HOST = 'mysql'
