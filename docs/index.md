@@ -1,6 +1,5 @@
-title: mavapa
+title: safbi
 
-Mavapa is an Identity Provider. It allows you to integrated your OpenLDAP or Active Directory with an
-OAuth service.
+SAfBI is a tool to centralize systems metrics and alerts.
 
 # Introducttion
