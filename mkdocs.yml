@@ -1,0 +1,28 @@
+site_name: 'safbi'
+site_description:
+  SAfBI is a tool to centralized administration metrics and alerts
+site_author: 'Sergio Tocalini'
+site_url: 'https://safbi.readthedocs.io'
+
+nav:
+  - Home: index.md
+
+theme:
+  name: material
+
+repo_name: 'sergiotocalini/safbi'
+repo_url: 'https://github.com/sergiotocalini/safbi'
+
+extra:
+  social:
+    - type: github
+      icon: fontawesome/brands/github-alt
+      link: 'https://github.com/sergiotocalini/safbi'
+
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - toc:
+      permalink: true
+  - meta
