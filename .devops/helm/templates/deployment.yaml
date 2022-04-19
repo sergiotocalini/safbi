@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "helmproj.fullname" . }}
+  labels:
+    app: {{ template "helmproj.name" . }}
+    chart: {{ template "helmproj.chart" . }}
+    draft: {{ .Values.draft | default "draft-app" }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "helmproj.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "helmproj.name" . }}
+        draft: {{ .Values.draft | default "draft-app" }}
+        release: {{ .Release.Name }}
+      annotations:
+        buildID: {{ .Values.buildID | default "" | quote }}
+    spec:
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.ports }}
+          ports:
+            {{- range $index, $item := . }}
+            - name: {{ $item.name }}
+              containerPort: {{ $item.containerPort }}
+              protocol: {{ $item.protocol | default "TCP" }}
+            {{- end }}
+          {{- end }}
+          {{- if .Values.probes.enabled }}
+          {{- with .Values.probes.liveness }}
+          livenessProbe:
+            {{ toYaml . | indent 2 }}
+          {{- end }}
+          {{- with .Values.probes.readiness }}
+          readinessProbe:
+            {{ toYaml . | indent 2 }}
+          {{- end }}
+          {{- end }}
+          {{- if or .Values.configmaps.files .Values.secrets.files }}
+          volumeMounts:
+            {{- range $key, $val := .Values.configmaps.files }}
+            - name: configs
+              mountPath: {{ $.Values.configmaps_files_path }}/{{ $key }}
+              subPath: {{ $key }}
+            {{- end }}
+            {{- range $key, $val := .Values.secrets.files }}
+            - name: secrets
+              mountPath: {{ $.Values.secrets_files_path }}/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: true
+            {{- end }}
+          {{- end }}
+          {{- if or .Values.configmaps.vars .Values.secrets.vars }}
+          envFrom:
+            {{- if .Values.configmaps.vars }}
+            - configMapRef:
+                name: {{ template "helmproj.fullname" . }}-configs-vars
+            {{- end }}
+            {{- if .Values.secrets.vars }}
+            - secretRef:
+                name: {{ template "helmproj.fullname" . }}-secrets-vars
+            {{- end }}
+          {{- end }}
+          {{- with .Values.env }}
+          env:
+            {{- range $k, $v := . }}
+            - name: {{ $k | quote}}
+              value: {{ $v | quote }}
+            {{- end }}
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{ toYaml . | indent 2 }}
+          {{- end }}
+          
+      {{- if or .Values.configmaps.files .Values.secrets.files }}
+      volumes:
+        {{- if .Values.configmaps.files }}
+        - name: configs
+          configMap:
+            name: {{ template "helmproj.fullname" . }}-configs-files
+        {{- end }}
+        {{- if .Values.secrets.files }}
+        - name: secrets
+          secret:
+            secretName: {{ template "helmproj.fullname" . }}-secrets-files
+        {{- end }}
+      {{- end }}        
+          
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{ toYaml . | indent 2 }}
+      {{- end }}
+      
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{ toYaml . | indent 2 }}
+      {{- end }}
+      
+      {{- with .Values.affinity }}
+      affinity:
+        {{ toYaml . | indent 2 }}
+      {{- end }}
+      
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{ toYaml . | indent 8 }}
+      {{- end }}

@@ -1,0 +1,11 @@
+{{- if .Values.configmaps.files }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "helmproj.fullname" . }}-configs-files
+data:
+{{- range $key, $value := .Values.configmaps.files }}
+  {{ $key }}: |-
+    {{- $value | nindent 4 -}}
+{{- end }}
+{{- end }}

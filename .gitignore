@@ -102,3 +102,10 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# MacOS
+.DS_Store
+
+# Helm packages
+.devops/helm/*.tgz
+.devops/helm/**/*.tgz

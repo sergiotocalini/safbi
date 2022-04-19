@@ -1,0 +1,35 @@
+image:
+  tag: latest
+  repository: sergiotocalini/safbi
+
+service:
+  type: ClusterIP
+  
+configmaps:
+  files:
+    configs.json: |
+      {
+        "DEBUG": true,
+        "ENV": "Development",
+        "PONY_GENERATE_MAPPING": {
+          "create_tables": true
+        },
+        "APPLICATION_ROOT": "/safbi",
+        "PONY_DEBUG": true,
+        "PORT": 5000
+      }
+
+secrets:
+  files:
+    secrets.json: |
+      {
+        "PONY": {
+          "db": "safbi",
+          "host": "mysql-innodb.mysql-cluster.svc.cluster.local",
+          "port": 6446,
+          "passwd": "1234567890",
+          "provider": "mysql",
+          "user": "app_safbi"
+        },
+        "SECRET_KEY": "37716d1369474d17928d20d0b2cab998"
+      }

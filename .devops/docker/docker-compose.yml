@@ -1,37 +1,32 @@
 version: '3'
-networks:
-  default:
-    external:
-      name: mynetwork
-
 services:
   mysql:
     container_name: mysql
     restart: always
     image: mysql:latest
     volumes:
-      - ~/.docker/volumes/mysql/data:/var/lib/mysql
+      - /Users/sergio.tocalini/.docker/volumes/mysql/data:/var/lib/mysql
     ports:
       - 3306:3306
     security_opt:
     - seccomp:unconfined
     environment:
       MYSQL_ROOT_PASSWORD: 'root1234'
-      MYSQL_USER: 'app_safbi'
+      MYSQL_USER: 'app_mavapa'
       MYSQL_PASSWORD: '1234567890'
-      MYSQL_DATABASE: 'safbi'
+      MYSQL_DATABASE: 'mavapa'
 
-  safbi:
-    container_name: safbi
+  mavapa:
+    container_name: mavapa
     restart: always
-    image: safbi:latest
+    image: mavapa:latest
     build:
+      dockerfile: .devops/docker/Dockerfile
       context: .
-      dockerfile: Dockerfile
     ports:
-      - 7007:7007
+      - 7001:7001
     environment:
-      APP_SETTINGS: safbi.config.Docker
+      APP_SETTINGS: mavapa.config.Docker
     depends_on:
       - mysql
 

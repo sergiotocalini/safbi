@@ -1,0 +1,25 @@
+{{- if and (.Values.service) (.Values.service.ports) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "helmproj.fullname" . }}
+  labels:
+    app: {{ template "helmproj.name" . }}
+    chart: {{ template "helmproj.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- with .Values.service.ports }}
+  ports:
+    {{- range $index, $item :=  . }}
+    - port: {{ $item.port }}
+      targetPort: {{ $item.targetPort }}
+      protocol: {{ $item.protocol | default "TCP" }}
+      name: {{ $item.name }}
+    {{- end }}
+  {{- end }}
+  selector:
+    app: {{ template "helmproj.name" . }}
+    release: {{ .Release.Name }}
+{{- end }}

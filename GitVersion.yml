@@ -1,0 +1,43 @@
+assembly-informational-format: '{NuGetVersion}'
+next-version: 1.0.0
+mode: ContinuousDeployment
+branches:
+  master:
+    mode: ContinuousDelivery
+  release:
+    tag: rc
+  hotfix:
+    tag: hf
+    increment: Patch
+  develop:
+    tag: dev
+    increment: Minor
+  feature:
+    tag: ft-{BranchName}
+    increment: Minor
+  devops:
+    regex: devops[/-]
+    tag: do-{BranchName}
+    source-branches: ['develop', 'feature']
+    increment: Minor
+  temp:
+    regex: temp[/-]
+    tag: tmp-{BranchName}
+    source-branches: ['develop', 'feature']
+    increment: Minor
+  test:
+    regex: tests?[/-]
+    tag: tst-{BranchName}
+    source-branches: ['develop', 'feature']
+    increment: Minor
+  sec:
+    regex: sec[/-]
+    tag: sec-{BranchName}
+    source-branches: ['develop', 'feature']
+    increment: Minor
+  bugfix:
+    regex: bugfix(es)?[/-]
+    tag: bug-{BranchName}
+    source-branches: ['develop', 'feature']
+    increment: Minor
+    

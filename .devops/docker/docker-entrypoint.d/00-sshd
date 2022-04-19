@@ -1,0 +1,24 @@
+#!/bin/sh
+set -e
+
+[ ${SSH_ENABLE:-false} != "true" ] && exit 0
+
+echo """
+# This is ssh server systemwide configuration file.
+#
+# /etc/sshd_config
+
+Port			${SSH_PORT:-2222}
+LoginGraceTime		180
+X11Forwarding		yes
+Ciphers			aes128-cbc,3des-cbc,aes256-cbc,aes128-ctr,aes192-ctr,aes256-ctr
+MACs			hmac-sha1,hmac-sha1-96
+StrictModes		yes
+SyslogFacility		DAEMON
+PasswordAuthentication	yes
+PermitEmptyPasswords	no
+PermitRootLogin		yes
+Subsystem sftp		internal-sftp
+"""  > /etc/ssh/sshd_config
+ssh-keygen -A
+/usr/sbin/sshd

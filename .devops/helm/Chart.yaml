@@ -1,0 +1,15 @@
+apiVersion: v2
+name: safbi
+version: "1.0.0"
+appVersion: "1.0.0"
+home: https://github.com/sergiotocalini/safbi
+description: "A safbi Helm chart for Kubernetes"
+keywords:
+  - monitoring
+sources:
+  - https://github.com/sergiotocalini/safbi
+type: application
+maintainers:
+  - name: "Sergio Tocalini"
+    email: sergiotocalini@gmail.com
+    url: https://sergiotocalini.github.io

@@ -1,7 +1,7 @@
 certifi
 chardet
 click
-Flask
+Flask==2.0.1
 gunicorn
 idna
 itsdangerous

@@ -1,40 +1,39 @@
 #!/usr/bin/env python
+import json
 import os
 # import arrow
 import urllib
-import json
-# import numpy as np
-import pandas as pd
 from datetime import datetime
 # from dateutil.relativedelta import relativedelta
 from functools import wraps
-from flask import Flask, request, render_template, jsonify
-from flask import url_for, abort, redirect, session
-from .lib.models import db, commit, db_session, count, select, sql_debug, desc
-from .lib.models import User, Config
+
+# import numpy as np
+import pandas as pd
+from flask import (Flask, abort, jsonify, redirect, render_template, request,
+                   session, url_for)
 # from mavapa import mavapa, get_user_data
 from pyzabbix import ZabbixAPI
 
+from models import (Config, User, commit, count, db, db_session, desc, select,
+                    sql_debug)
+
 app = Flask(__name__, instance_relative_config=True)
-app.config.from_object(os.environ['APP_SETTINGS'])
-app.secret_key = app.config['SECRET_KEY']
+app.config.from_object('config')
+app.config.from_json('configs.json', silent=True)
+app.config.from_json('secrets.json', silent=True)
+
+db.bind(**app.config['PONY'])
+db.generate_mapping(**app.config['PONY_GENERATE_MAPPING'])
+sql_debug(app.config['PONY_DEBUG'])
+
 # app.register_blueprint(mavapa, url_prefix='/oauth/mavapa')
 
+context = app.config.get('APPLICATION_ROOT', '')
 if 'CDN_LOCAL' not in app.config:
-    context = app.config.get('APPLICATION_ROOT', '')
     app.config['CDN_LOCAL'] = '%s/static/app' % context
 
 if 'CDN_EXTRAS' not in app.config:
     app.config['CDN_EXTRAS'] = '%s/static/extras' % context
-
-if app.config['DB_TYPE'] == 'mysql':
-    db.bind(app.config['DB_TYPE'], host=app.config['DB_HOST'],
-            port=app.config['DB_PORT'], db=app.config['DB_NAME'],
-            user=app.config['DB_USER'], passwd=app.config['DB_PASS'])
-    db.generate_mapping(create_tables=True)
-else:
-    exit(0)
-sql_debug(app.config.get('DB_DEBUG', False))
 
 
 def safe_execute(default, exception, function, *args):
@@ -102,33 +101,26 @@ def fresh_user():
 @app.before_request
 @db_session(retry=3)
 def before_request():
-    refresh_user = False
-    if 'access_token' not in session:
-        return
-    if 'last_update' not in session:
-        session['last_update'] = datetime.now()
-        refresh_user = True
+    session_token = session.get('access_token', None)
+    session_expired = session.get('session_expired', datetime.now())
+    if (session_expired.replace(tzinfo=None) > datetime.now()):
+        if session_token:
+            g.user = get_data('User', email=session['user']['email'])
+            if g.user:
+                g.user.last_seen = datetime.now()
+                commit()
+                session['user']['displayname'] = user.displayname
+                session['user']['id'] = user.id
+                session['user']['title'] = user.title
+                session['user']['avatar'] = user.avatar
+                session['user']['admin'] = user.admin
+                session['user']['status'] = user.status
+            else:
+                redirect(url_for('logout'))
     else:
-        if (datetime.now() - session['last_update']).seconds > 60:
-            refresh_user = True
-            session['last_update'] = datetime.now()
-    if 'user' in session and refresh_user:
-        # mavapa_user = get_user_data(session)
-        # if mavapa_user:
-        user = get_data('User', email=session['user']['email'])
-        if user:
-            user.last_seen = datetime.now()
-            commit()
-            session['user']['displayname'] = user.displayname
-            session['user']['id'] = user.id
-            session['user']['title'] = user.title
-            session['user']['avatar'] = user.avatar
-            session['user']['admin'] = user.admin
-            session['user']['status'] = user.status
-        else:
-            logout()
+        redirect(url_for('logout'))
 
-
+        
 @db_session(retry=3)
 def get_data(table, **kwargs):
     if kwargs:
